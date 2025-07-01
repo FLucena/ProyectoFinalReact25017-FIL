@@ -41,18 +41,54 @@ const Admin = () => {
     deleteProduct 
   } = useProducts();
   
+  // Estados para manejo de la interfaz de administración
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  
+  // Estados para filtrado y ordenamiento
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('title');
   const [sortOrder, setSortOrder] = useState('asc');
 
+  // Carga productos al montar el componente
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Calcula estadísticas para el dashboard
+  const stats = {
+    totalProducts: products.length,
+    totalUsers: 0, // Placeholder para futura implementación
+    totalOrders: 0, // Placeholder para futura implementación
+    totalRevenue: products.reduce((sum, product) => sum + (product.price || 0), 0)
+  };
+
+  // Filtra y ordena productos según criterios de búsqueda
+  const filteredAndSortedProducts = products
+    .filter(product => 
+      product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.genre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.platform.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      let aValue = a[sortBy];
+      let bValue = b[sortBy];
+      
+      // Normaliza strings para comparación
+      if (typeof aValue === 'string') {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+      
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
 
   const handleAddProduct = async (productData) => {
     try {
@@ -93,39 +129,11 @@ const Admin = () => {
     setShowDeleteModal(true);
   };
 
-  const filteredAndSortedProducts = products
-    .filter(product => 
-      product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.genre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.platform.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      let aValue = a[sortBy];
-      let bValue = b[sortBy];
-      
-      if (typeof aValue === 'string') {
-        aValue = aValue.toLowerCase();
-        bValue = bValue.toLowerCase();
-      }
-      
-      if (sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1;
-      } else {
-        return aValue < bValue ? 1 : -1;
-      }
-    });
-
-  const stats = {
-    totalProducts: products.length,
-    totalUsers: 0, // Mock data
-    totalOrders: 0, // Mock data
-    totalRevenue: products.reduce((sum, product) => sum + (product.price || 0), 0)
-  };
-
   return (
     <ProtectedRoute requireAdmin={true}>
       <div className="container-fluid py-5">
         <div className="row">
+          {/* Sidebar de navegación */}
           <div className="col-md-3 col-lg-2">
             <div className="list-group">
               <button 
@@ -155,6 +163,7 @@ const Admin = () => {
             </div>
           </div>
 
+          {/* Contenido principal del panel */}
           <div className="col-md-9 col-lg-10">
             <div className="card shadow">
               <div className="card-body">
@@ -182,6 +191,7 @@ const Admin = () => {
                   </Alert>
                 )}
 
+                {/* Dashboard con estadísticas */}
                 {activeTab === 'dashboard' && (
                   <div className="row">
                     <div className="col-md-3 mb-4">
@@ -219,12 +229,14 @@ const Admin = () => {
                   </div>
                 )}
 
+                {/* Gestión de usuarios - Placeholder */}
                 {activeTab === 'users' && (
                   <Alert variant="info">
                     No hay usuarios registrados.
                   </Alert>
                 )}
 
+                {/* Gestión de juegos - Funcionalidad completa */}
                 {activeTab === 'games' && (
                   <div>
                     {loading ? (
@@ -234,6 +246,7 @@ const Admin = () => {
                       </div>
                     ) : (
                       <>
+                        {/* Controles de búsqueda y ordenamiento */}
                         <div className="row mb-4">
                           <div className="col-md-6">
                             <InputGroup>
@@ -270,6 +283,7 @@ const Admin = () => {
                           </div>
                         </div>
 
+                        {/* Tabla de productos */}
                         {filteredAndSortedProducts.length === 0 ? (
                           <Alert variant="info">
                             {searchTerm ? 'No se encontraron productos que coincidan con la búsqueda.' : 'No hay productos registrados.'}
@@ -343,6 +357,7 @@ const Admin = () => {
                   </div>
                 )}
 
+                {/* Gestión de órdenes - Placeholder */}
                 {activeTab === 'orders' && (
                   <Alert variant="info">
                     No hay órdenes registradas.
@@ -353,7 +368,7 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* Modal de formulario de producto */}
+        {/* Modal para formulario de producto (crear/editar) */}
         <ProductForm
           show={showProductForm}
           onHide={() => {
@@ -364,7 +379,7 @@ const Admin = () => {
           onSubmit={editingProduct ? handleEditProduct : handleAddProduct}
         />
 
-        {/* Modal de confirmación de eliminación */}
+        {/* Modal de confirmación para eliminar producto */}
         <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
           <Modal.Header closeButton>
             <Modal.Title>Confirmar Eliminación</Modal.Title>

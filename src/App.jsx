@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { Routes, Route, useLocation, Navigate } from "react-router-dom"
-import { Toaster, toast } from "sonner"
+import { ToastContainer, toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 import Header from "./components/Header"
 import Footer from "./components/Footer"
 import ProductList from "./components/ProductList"
@@ -12,8 +13,11 @@ import Login from "./components/Login"
 import GameFilters from "./components/GameFilters"
 import Offers from "./components/Offers"
 import MustHave from "./components/MustHave"
+
 import Perfil from "./pages/Perfil"
 import Admin from "./pages/Admin"
+import SobreProyecto from "./pages/SobreProyecto"
+import Contacto from "./pages/Contacto"
 import ProtectedRoute from "./components/ProtectedRoute"
 import SEO from "./components/SEO"
 import { useGames } from "./hooks/useGames"
@@ -21,9 +25,12 @@ import { useGameFilters } from "./hooks/useGameFilters"
 import { useCart } from "./hooks/useCart"
 import { AuthProvider } from "./context/AuthContext"
 import { ProductProvider } from "./context/ProductContext"
+import SkipLink from "./components/SkipLink"
+import { usePagination } from "./hooks/usePagination"
+import { FavoritesProvider } from "./context/FavoritesContext"
 
 function App() {
-  const { games, loading, error, usingMockData } = useGames();
+  const { games, loading, error, usingMockData, refetchGames, forceMockData } = useGames();
   const {
     filteredGames,
     searchTerm,
@@ -61,6 +68,79 @@ function App() {
   const location = useLocation();
   const [cartShouldRender, setCartShouldRender] = useState(false);
 
+  // Optimización: Memoizar cálculos costosos
+  const gamesWithDiscount = useMemo(() => 
+    games.map(game => ({
+      ...game,
+      discount: game.discount ?? Math.floor(Math.random() * 40),
+    })), [games]
+  );
+
+  const gamesWithRating = useMemo(() => 
+    games.map(game => ({
+      ...game,
+      rating: game.rating ?? (Math.random() * 2 + 3),
+    })), [games]
+  );
+
+  const offersFiltered = useMemo(() => 
+    gamesWithDiscount.filter(game => game.discount > 0), [gamesWithDiscount]
+  );
+
+  const mustHaveFiltered = useMemo(() => 
+    gamesWithRating.filter(game => game.rating >= 4.5), [gamesWithRating]
+  );
+
+  // Hook de paginación unificado
+  const offersPagination = usePagination(offersFiltered);
+  const mustHavePagination = usePagination(mustHaveFiltered);
+
+  // Optimización: Memoizar filtros aplicados
+  const applyFiltersToGames = useCallback((gamesToFilter) => {
+    return gamesToFilter.filter(game => {
+      let match = true;
+      if (searchTerm) {
+        match = match && game.title.toLowerCase().includes(searchTerm.toLowerCase());
+      }
+      if (selectedPlatform && selectedPlatform !== 'Todas las Plataformas') {
+        match = match && game.platform.toLowerCase().includes(selectedPlatform.toLowerCase());
+      }
+      if (selectedGenre && selectedGenre !== 'Todos los Géneros') {
+        match = match && game.genre.toLowerCase().includes(selectedGenre.toLowerCase());
+      }
+      return match;
+    });
+  }, [searchTerm, selectedPlatform, selectedGenre]);
+
+  const offersFilteredCount = useMemo(() => 
+    applyFiltersToGames(offersFiltered).length, [applyFiltersToGames, offersFiltered]
+  );
+
+  const mustHaveFilteredCount = useMemo(() => 
+    applyFiltersToGames(mustHaveFiltered).length, [applyFiltersToGames, mustHaveFiltered]
+  );
+
+  // Optimización: Memoizar conteos de página
+  const pageCounts = useMemo(() => {
+    const baseCounts = {
+      filteredCount: filteredGames.length,
+      totalCount: games.length
+    };
+
+    if (location.pathname === '/ofertas') {
+      return {
+        filteredCount: offersFilteredCount,
+        totalCount: offersFiltered.length
+      };
+    } else if (location.pathname === '/infaltables') {
+      return {
+        filteredCount: mustHaveFilteredCount,
+        totalCount: mustHaveFiltered.length
+      };
+    }
+    return baseCounts;
+  }, [location.pathname, filteredGames.length, games.length, offersFilteredCount, offersFiltered.length, mustHaveFilteredCount, mustHaveFiltered.length]);
+
   useEffect(() => {
     if (isCartOpen) setCartShouldRender(true);
   }, [isCartOpen]);
@@ -72,58 +152,21 @@ function App() {
     if (isCartOpen) closeCart();
   };
 
-  const showFilters = !['/login', '/perfil', '/admin'].includes(location.pathname);
+  // Optimización: Memoizar rutas que no muestran filtros
+  const showFilters = useMemo(() => 
+    !['/login', '/perfil', '/admin', '/sobre-proyecto', '/contacto'].includes(location.pathname),
+    [location.pathname]
+  );
 
-  let filteredCount = filteredGames.length;
-  let totalCount = games.length;
-
-  const gamesWithDiscount = games.map(game => ({
-    ...game,
-    discount: game.discount ?? Math.floor(Math.random() * 40),
-  }));
-  const offersFiltered = gamesWithDiscount.filter(game => game.discount > 0);
-  let offersFilteredCount = offersFiltered.filter(game => {
-    let match = true;
-    if (searchTerm) match = match && game.title.toLowerCase().includes(searchTerm.toLowerCase());
-    if (selectedPlatform && selectedPlatform !== 'Todas las Plataformas') match = match && game.platform.toLowerCase().includes(selectedPlatform.toLowerCase());
-    if (selectedGenre && selectedGenre !== 'Todos los Géneros') match = match && game.genre.toLowerCase().includes(selectedGenre.toLowerCase());
-    return match;
-  }).length;
-  let offersTotalCount = offersFiltered.length;
-
-  const gamesWithRating = games.map(game => ({
-    ...game,
-    rating: game.rating ?? (Math.random() * 2 + 3),
-  }));
-  const mustHaveFiltered = gamesWithRating.filter(game => game.rating >= 4.5);
-  let mustHaveFilteredCount = mustHaveFiltered.filter(game => {
-    let match = true;
-    if (searchTerm) match = match && game.title.toLowerCase().includes(searchTerm.toLowerCase());
-    if (selectedPlatform && selectedPlatform !== 'Todas las Plataformas') match = match && game.platform.toLowerCase().includes(selectedPlatform.toLowerCase());
-    if (selectedGenre && selectedGenre !== 'Todos los Géneros') match = match && game.genre.toLowerCase().includes(selectedGenre.toLowerCase());
-    return match;
-  }).length;
-  let mustHaveTotalCount = mustHaveFiltered.length;
-
-  let pageFilteredCount = filteredCount;
-  let pageTotalCount = totalCount;
-  if (location.pathname === '/ofertas') {
-    pageFilteredCount = offersFilteredCount;
-    pageTotalCount = offersTotalCount;
-  } else if (location.pathname === '/infaltables') {
-    pageFilteredCount = mustHaveFilteredCount;
-    pageTotalCount = mustHaveTotalCount;
-  }
-
-  const addToCart = (item) => {
+  // Optimización: Consolidar funciones de carrito con notificaciones
+  const addToCart = useCallback((item) => {
     originalAddToCart(item);
     toast.success(`${item.title} agregado al carrito`, {
-      position: "top-right",
-      duration: 2000,
+      autoClose: 2000,
     });
-  };
+  }, [originalAddToCart]);
 
-  const updateQuantity = (itemId, quantity, prevQuantity) => {
+  const updateQuantity = useCallback((itemId, quantity, prevQuantity) => {
     const item = cartItems.find(item => item.id === itemId);
     if (!item) return;
     
@@ -131,188 +174,234 @@ function App() {
     
     if (quantity > prevQuantity) {
       toast.success(`${item.title} agregado al carrito`, {
-        position: "top-right",
-        duration: 2000,
+        autoClose: 2000,
       });
     } else if (quantity < prevQuantity) {
       toast.error(`${item.title} reducido en el carrito`, {
-        position: "top-right",
-        duration: 2000,
+        autoClose: 2000,
       });
     }
-  };
+  }, [cartItems, originalUpdateQuantity]);
   
-  const removeFromCart = (itemId) => {
+  const removeFromCart = useCallback((itemId) => {
     const item = cartItems.find(item => item.id === itemId);
     if (item) {
       originalRemoveFromCart(itemId);
       toast.error(`${item.title} eliminado del carrito`, {
-        position: "top-right",
-        duration: 2000,
+        autoClose: 2000,
       });
     }
-  };
+  }, [cartItems, originalRemoveFromCart]);
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     originalClearCart();
     toast.error('Carrito vaciado', {
-      position: "top-right",
-      duration: 2000,
+      autoClose: 2000,
     });
-  };
+  }, [originalClearCart]);
 
   return (
     <AuthProvider>
       <ProductProvider>
-        <SEO />
-        <div className="d-flex flex-column min-vh-100">
-          <Toaster richColors />
-          
-          {usingMockData && (
-            <div className="alert alert-warning alert-dismissible fade show m-0" role="alert" style={{ zIndex: 1000 }}>
-              <strong>⚠️ Modo Demo:</strong> Estás viendo datos de demostración. La API externa no está disponible en este momento.
-              <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          )}
-          
-          <Header
-            cartCount={cartCount}
-            toggleCart={toggleCart}
-            toggleLogin={toggleLogin}
-          />
+        <FavoritesProvider>
+          <SEO />
+          <SkipLink />
+          <div className="d-flex flex-column min-vh-100">
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+            />
+            
 
-          <main className="flex-grow-1" style={{ paddingTop: '6rem' }}>
-            {showFilters && (
-              <div className="container">
-                <GameFilters
-                  searchTerm={searchTerm}
-                  setSearchTerm={setSearchTerm}
-                  selectedPlatform={selectedPlatform}
-                  setSelectedPlatform={setSelectedPlatform}
-                  selectedGenre={selectedGenre}
-                  setSelectedGenre={setSelectedGenre}
-                  sortBy={sortBy}
-                  setSortBy={setSortBy}
-                  clearFilters={clearFilters}
-                  hasActiveFilters={hasActiveFilters}
-                  platforms={platforms}
-                  genres={genres}
-                  filteredGames={filteredGames}
-                  totalGames={totalGames}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                  totalPages={totalPages}
-                  currentPageGames={currentPageGames}
-                  filteredCount={pageFilteredCount}
-                  totalCount={pageTotalCount}
-                />
-              </div>
-            )}
+            
+            <Header
+              cartCount={cartCount}
+              toggleCart={toggleCart}
+              toggleLogin={toggleLogin}
+            />
 
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <ProductList 
-                    products={filteredGames} 
-                    addToCart={addToCart} 
-                    removeFromCart={removeFromCart}
-                    cartItems={cartItems}
-                    updateQuantity={updateQuantity}
-                    loading={loading} 
-                    error={error} 
-                  />
-                }
-              />
-              <Route
-                path="/product/:id"
-                element={
-                  <ProductDetail
-                    games={games}
+            <main 
+              id="main-content"
+              className="flex-grow-1" 
+              style={{ paddingTop: '8rem' }}
+              role="main"
+              aria-label="Contenido principal"
+            >
+              <Routes>
+                <Route path="/" element={
+                  <>
+                    {showFilters && (
+                      <GameFilters
+                        searchTerm={searchTerm}
+                        setSearchTerm={setSearchTerm}
+                        selectedPlatform={selectedPlatform}
+                        setSelectedPlatform={setSelectedPlatform}
+                        selectedGenre={selectedGenre}
+                        setSelectedGenre={setSelectedGenre}
+                        sortBy={sortBy}
+                        setSortBy={setSortBy}
+                        clearFilters={clearFilters}
+                        hasActiveFilters={hasActiveFilters}
+                        platforms={platforms}
+                        genres={genres}
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                        totalPages={totalPages}
+                        totalGames={totalGames}
+                        currentPageGames={currentPageGames}
+                        pageCounts={pageCounts}
+                      />
+                    )}
+                    <ProductList 
+                      products={filteredGames} 
+                      addToCart={addToCart} 
+                      removeFromCart={removeFromCart}
+                      cartItems={cartItems}
+                      updateQuantity={updateQuantity}
+                      loading={loading}
+                      error={error}
+                      usingMockData={usingMockData}
+                      onRefetch={refetchGames}
+                      onForceMock={forceMockData}
+                    />
+                  </>
+                } />
+                <Route path="/ofertas" element={
+                  <>
+                    {showFilters && (
+                      <GameFilters
+                        searchTerm={searchTerm}
+                        setSearchTerm={setSearchTerm}
+                        selectedPlatform={selectedPlatform}
+                        setSelectedPlatform={setSelectedPlatform}
+                        selectedGenre={selectedGenre}
+                        setSelectedGenre={setSelectedGenre}
+                        sortBy={sortBy}
+                        setSortBy={setSortBy}
+                        clearFilters={clearFilters}
+                        hasActiveFilters={hasActiveFilters}
+                        platforms={platforms}
+                        genres={genres}
+                        currentPage={offersPagination.currentPage}
+                        setCurrentPage={offersPagination.setCurrentPage}
+                        totalPages={offersPagination.totalPages}
+                        totalGames={offersPagination.totalItems}
+                        currentPageGames={offersPagination.currentPageItems}
+                        pageCounts={pageCounts}
+                      />
+                    )}
+                    <Offers 
+                      games={offersPagination.paginatedItems} 
+                      addToCart={addToCart}
+                      removeFromCart={removeFromCart}
+                      cartItems={cartItems}
+                      updateQuantity={updateQuantity}
+                      loading={loading}
+                      error={error}
+                      usingMockData={usingMockData}
+                      onRefetch={refetchGames}
+                      onForceMock={forceMockData}
+                    />
+                  </>
+                } />
+                <Route path="/infaltables" element={
+                  <>
+                    {showFilters && (
+                      <GameFilters
+                        searchTerm={searchTerm}
+                        setSearchTerm={setSearchTerm}
+                        selectedPlatform={selectedPlatform}
+                        setSelectedPlatform={setSelectedPlatform}
+                        selectedGenre={selectedGenre}
+                        setSelectedGenre={setSelectedGenre}
+                        sortBy={sortBy}
+                        setSortBy={setSortBy}
+                        clearFilters={clearFilters}
+                        hasActiveFilters={hasActiveFilters}
+                        platforms={platforms}
+                        genres={genres}
+                        currentPage={mustHavePagination.currentPage}
+                        setCurrentPage={mustHavePagination.setCurrentPage}
+                        totalPages={mustHavePagination.totalPages}
+                        totalGames={mustHavePagination.totalItems}
+                        currentPageGames={mustHavePagination.currentPageItems}
+                        pageCounts={pageCounts}
+                      />
+                    )}
+                    <MustHave 
+                      games={mustHavePagination.paginatedItems} 
+                      addToCart={addToCart}
+                      removeFromCart={removeFromCart}
+                      cartItems={cartItems}
+                      updateQuantity={updateQuantity}
+                      loading={loading}
+                      error={error}
+                      usingMockData={usingMockData}
+                      onRefetch={refetchGames}
+                      onForceMock={forceMockData}
+                    />
+                  </>
+                } />
+                <Route path="/product/:id" element={
+                  <ProductDetail 
                     addToCart={addToCart}
                     removeFromCart={removeFromCart}
                     cartItems={cartItems}
                     updateQuantity={updateQuantity}
-                    loading={loading}
-                    error={error}
                   />
-                }
-              />
-              <Route
-                path="/ofertas"
-                element={
-                  <Offers 
-                    games={games} 
-                    addToCart={addToCart} 
-                    removeFromCart={removeFromCart}
-                    cartItems={cartItems}
-                    updateQuantity={updateQuantity}
-                    loading={loading} 
-                    error={error} 
-                    searchTerm={searchTerm}
-                    selectedPlatform={selectedPlatform}
-                    selectedGenre={selectedGenre}
-                  />
-                }
-              />
-              <Route
-                path="/infaltables"
-                element={
-                  <MustHave 
-                    games={games} 
-                    addToCart={addToCart} 
-                    removeFromCart={removeFromCart}
-                    cartItems={cartItems}
-                    updateQuantity={updateQuantity}
-                    loading={loading} 
-                    error={error} 
-                    searchTerm={searchTerm}
-                    selectedPlatform={selectedPlatform}
-                    selectedGenre={selectedGenre}
-                  />
-                }
-              />
-              <Route
-                path="/login"
-                element={
-                  isLoginOpen ? (
-                    <Login closeLogin={() => setIsLoginOpen(false)} />
-                  ) : (
-                    <Navigate to="/" replace />
-                  )
-                }
-              />
-              <Route 
-                path="/perfil" 
-                element={
-                  <ProtectedRoute>
-                    <Perfil />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route path="/admin" element={<Admin />} />
-            </Routes>
+                } />
+                <Route
+                  path="/login"
+                  element={
+                    isLoginOpen ? (
+                      <Login closeLogin={() => setIsLoginOpen(false)} />
+                    ) : (
+                      <Navigate to="/" replace />
+                    )
+                  }
+                />
+                <Route 
+                  path="/perfil" 
+                  element={
+                    <ProtectedRoute>
+                      <Perfil />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/sobre-proyecto" element={<SobreProyecto />} />
+                <Route path="/contacto" element={<Contacto />} />
+              </Routes>
 
-            {isLoginOpen && (
-              <Login closeLogin={() => setIsLoginOpen(false)} />
-            )}
+              {isLoginOpen && (
+                <Login closeLogin={() => setIsLoginOpen(false)} />
+              )}
 
-            {cartShouldRender && (
-              <Cart
-                cart={cartItems}
-                removeFromCart={removeFromCart}
-                closeCart={closeCart}
-                updateQuantity={updateQuantity}
-                clearCart={clearCart}
-                isOpen={isCartOpen}
-                onExited={handleCartExited}
-                toggleLogin={toggleLogin}
-              />
-            )}
-          </main>
+              {cartShouldRender && (
+                <Cart
+                  cart={cartItems}
+                  removeFromCart={removeFromCart}
+                  closeCart={closeCart}
+                  updateQuantity={updateQuantity}
+                  clearCart={clearCart}
+                  isOpen={isCartOpen}
+                  onExited={handleCartExited}
+                  toggleLogin={toggleLogin}
+                />
+              )}
+            </main>
 
-          <Footer />
-        </div>
+            <Footer />
+          </div>
+        </FavoritesProvider>
       </ProductProvider>
     </AuthProvider>
   )

@@ -1,4 +1,4 @@
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback, useEffect, useMemo } from 'react';
 
 const initialState = {
   items: [],
@@ -49,6 +49,8 @@ function cartReducer(state, action) {
       };
     case 'CLEAR_CART':
       return { ...state, items: [] };
+    case 'LOAD_CART':
+      return { ...state, items: action.payload };
     default:
       return state;
   }
@@ -56,6 +58,28 @@ function cartReducer(state, action) {
 
 export const useCart = () => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
+
+  // Optimización: Cargar carrito desde localStorage al iniciar
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      try {
+        const cartItems = JSON.parse(savedCart);
+        dispatch({ type: 'LOAD_CART', payload: cartItems });
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
+      }
+    }
+  }, []);
+
+  // Optimización: Guardar carrito en localStorage cuando cambie
+  useEffect(() => {
+    try {
+      localStorage.setItem('cart', JSON.stringify(state.items));
+    } catch (error) {
+      console.error('Error saving cart to localStorage:', error);
+    }
+  }, [state.items]);
 
   const addToCart = useCallback((item) => {
     dispatch({ type: 'ADD_ITEM', payload: item });
@@ -81,7 +105,24 @@ export const useCart = () => {
     dispatch({ type: 'CLEAR_CART' });
   }, []);
 
-  const total = state.items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+  // Optimización: Memoizar cálculos costosos
+  const total = useMemo(() => 
+    state.items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0),
+    [state.items]
+  );
+
+  const itemCount = useMemo(() => 
+    state.items.reduce((sum, item) => sum + (item.quantity || 1), 0),
+    [state.items]
+  );
+
+  // Optimización: Memoizar información adicional del carrito
+  const cartInfo = useMemo(() => ({
+    isEmpty: state.items.length === 0,
+    uniqueItems: state.items.length,
+    totalItems: itemCount,
+    totalValue: total
+  }), [state.items.length, itemCount, total]);
 
   return {
     items: state.items,
@@ -93,6 +134,7 @@ export const useCart = () => {
     closeCart,
     clearCart,
     total,
-    itemCount: state.items.reduce((sum, item) => sum + (item.quantity || 1), 0)
+    itemCount,
+    ...cartInfo
   };
 }; 

@@ -2,9 +2,10 @@
 
 import { useState } from "react"
 import { X, Eye, EyeOff } from "lucide-react"
+import { FaTimes, FaEye, FaEyeSlash, FaUser, FaLock, FaEnvelope, FaSignInAlt, FaUserPlus } from "react-icons/fa"
 import { useAuth } from "../context/AuthContext"
 import { useNavigate, useLocation } from "react-router-dom"
-import { toast } from "sonner"
+import { toast } from "react-toastify"
 
 const Login = ({ closeLogin }) => {
   const [email, setEmail] = useState("")
@@ -33,7 +34,14 @@ const Login = ({ closeLogin }) => {
       }
 
       if (result.success) {
-        toast.success(result.message)
+        toast.success(result.message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        })
         closeLogin()
         
         // Redirigir a la página anterior o al home
@@ -67,7 +75,7 @@ const Login = ({ closeLogin }) => {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="fs-4 fw-bold m-0">{isRegister ? "Crear Cuenta" : "Iniciar Sesión"}</h2>
           <button onClick={closeLogin} className="btn btn-sm btn-outline-secondary rounded-circle">
-            <X size={20} />
+            <FaTimes size={20} />
           </button>
         </div>
 
@@ -83,7 +91,8 @@ const Login = ({ closeLogin }) => {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label htmlFor="email" className="form-label">
+            <label htmlFor="email" className="form-label d-flex align-items-center gap-2">
+              <FaEnvelope size={14} />
               Correo Electrónico
             </label>
             <input
@@ -99,7 +108,8 @@ const Login = ({ closeLogin }) => {
           </div>
 
           <div className="mb-3">
-            <label htmlFor="password" className="form-label">
+            <label htmlFor="password" className="form-label d-flex align-items-center gap-2">
+              <FaLock size={14} />
               Contraseña
             </label>
             <div className="input-group">
@@ -119,14 +129,15 @@ const Login = ({ closeLogin }) => {
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={isLoading}
               >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
               </button>
             </div>
           </div>
 
           {isRegister && (
             <div className="mb-3">
-              <label htmlFor="confirmPassword" className="form-label">
+              <label htmlFor="confirmPassword" className="form-label d-flex align-items-center gap-2">
+                <FaLock size={14} />
                 Confirmar Contraseña
               </label>
               <div className="input-group">
@@ -146,7 +157,7 @@ const Login = ({ closeLogin }) => {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   disabled={isLoading}
                 >
-                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showConfirmPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                 </button>
               </div>
             </div>
@@ -154,7 +165,7 @@ const Login = ({ closeLogin }) => {
 
           <button 
             type="submit" 
-            className="btn btn-danger w-100 py-2 mb-3"
+            className="btn btn-danger w-100 py-2 mb-3 d-flex align-items-center justify-content-center gap-2"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -163,7 +174,10 @@ const Login = ({ closeLogin }) => {
                 {isRegister ? "Registrándose..." : "Iniciando sesión..."}
               </>
             ) : (
-              isRegister ? "Registrarse" : "Iniciar Sesión"
+              <>
+                {isRegister ? <FaUserPlus size={16} /> : <FaSignInAlt size={16} />}
+                {isRegister ? "Registrarse" : "Iniciar Sesión"}
+              </>
             )}
           </button>
         </form>

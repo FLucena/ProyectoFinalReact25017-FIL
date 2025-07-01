@@ -1,10 +1,8 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { toast } from 'sonner';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { toast } from 'react-toastify';
+import { fetchMockGames } from '../data/mockData';
 
 const ProductContext = createContext();
-
-// MockAPI URL - puedes cambiar esto por tu propia URL de MockAPI
-const MOCKAPI_URL = 'https://mockapi.io/projects/your-project-id';
 
 export function ProductProvider({ children }) {
   const [products, setProducts] = useState([]);
@@ -15,74 +13,95 @@ export function ProductProvider({ children }) {
   useEffect(() => {
     const savedProducts = localStorage.getItem('products');
     if (savedProducts) {
-      setProducts(JSON.parse(savedProducts));
+      try {
+        setProducts(JSON.parse(savedProducts));
+      } catch (err) {
+        console.error('Error parsing saved products:', err);
+        // Cargar datos mock como fallback
+        loadMockProducts();
+      }
+    } else {
+      // Cargar datos mock iniciales
+      loadMockProducts();
+    }
+  }, []);
+
+  // Función para cargar productos mock simulando API
+  const loadMockProducts = useCallback(async () => {
+    try {
+      const response = await fetchMockGames(500);
+      setProducts(response.data);
+    } catch (err) {
+      console.error('Error loading mock products:', err);
+      setProducts([]);
     }
   }, []);
 
   // Guardar productos en localStorage cuando cambien
   useEffect(() => {
-    localStorage.setItem('products', JSON.stringify(products));
+    try {
+      localStorage.setItem('products', JSON.stringify(products));
+    } catch (err) {
+      console.error('Error saving products to localStorage:', err);
+    }
   }, [products]);
 
-  const fetchProducts = async () => {
+  // Optimización: Función unificada para manejo de errores
+  const handleError = useCallback((error, defaultMessage) => {
+    const errorMessage = error?.message || defaultMessage;
+    setError(errorMessage);
+    toast.error(errorMessage);
+    console.error('Product operation error:', error);
+  }, []);
+
+  // Optimización: Función unificada para operaciones exitosas
+  const handleSuccess = useCallback((message) => {
+    toast.success(message);
+    setError(null);
+  }, []);
+
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
     
     try {
-      // Simulación de llamada a API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Por ahora usamos datos mock locales
-      const mockProducts = [
-        {
-          id: 1,
-          title: "The Legend of Zelda: Breath of the Wild",
-          price: 59.99,
-          description: "Un juego de aventura épico que redefine el género open-world.",
-          genre: "Aventura",
-          platform: "Nintendo Switch",
-          image: "https://via.placeholder.com/300x200?text=Zelda",
-          rating: 4.8,
-          releaseDate: "2017-03-03"
-        },
-        {
-          id: 2,
-          title: "Red Dead Redemption 2",
-          price: 49.99,
-          description: "Una épica historia del Oeste americano en la era del declive del Salvaje Oeste.",
-          genre: "Acción",
-          platform: "PlayStation 4",
-          image: "https://via.placeholder.com/300x200?text=RDR2",
-          rating: 4.9,
-          releaseDate: "2018-10-26"
-        }
-      ];
-      
-      setProducts(mockProducts);
+      // Simular llamada a API con datos mock
+      const response = await fetchMockGames(1000);
+      setProducts(response.data);
+      handleSuccess('Productos cargados exitosamente');
     } catch (err) {
-      setError('Error al cargar los productos');
-      toast.error('Error al cargar los productos');
+      handleError(err, 'Error al cargar los productos');
     } finally {
       setLoading(false);
     }
-  };
+  }, [handleError, handleSuccess]);
 
-  const addProduct = async (productData) => {
+  const validateProductData = useCallback((productData) => {
+    const errors = [];
+    const validations = [
+      { field: 'title', condition: !productData.title?.trim(), message: 'El nombre del producto es obligatorio' },
+      { field: 'price', condition: !productData.price || productData.price <= 0, message: 'El precio debe ser mayor a 0' },
+      { field: 'description', condition: !productData.description || productData.description.length < 10, message: 'La descripción debe tener al menos 10 caracteres' },
+      { field: 'genre', condition: !productData.genre?.trim(), message: 'El género es obligatorio' },
+      { field: 'platform', condition: !productData.platform?.trim(), message: 'La plataforma es obligatoria' }
+    ];
+
+    validations.forEach(({ condition, message }) => {
+      if (condition) errors.push(message);
+    });
+
+    return errors;
+  }, []);
+
+  const addProduct = useCallback(async (productData) => {
     setLoading(true);
     setError(null);
     
     try {
       // Validaciones
-      if (!productData.title || productData.title.trim().length === 0) {
-        throw new Error('El nombre del producto es obligatorio');
-      }
-      
-      if (!productData.price || productData.price <= 0) {
-        throw new Error('El precio debe ser mayor a 0');
-      }
-      
-      if (!productData.description || productData.description.length < 10) {
-        throw new Error('La descripción debe tener al menos 10 caracteres');
+      const validationErrors = validateProductData(productData);
+      if (validationErrors.length > 0) {
+        throw new Error(validationErrors.join(', '));
       }
 
       // Simulación de llamada a API
@@ -92,37 +111,36 @@ export function ProductProvider({ children }) {
         ...productData,
         id: Date.now(),
         rating: 0,
-        releaseDate: productData.releaseDate || new Date().toISOString().split('T')[0]
+        releaseDate: productData.releaseDate || new Date().toISOString().split('T')[0],
+        image: productData.image || "https://via.placeholder.com/300x200?text=Game"
       };
       
       setProducts(prev => [...prev, newProduct]);
-      toast.success('Producto agregado exitosamente');
+      handleSuccess('Producto agregado exitosamente');
       return newProduct;
     } catch (err) {
-      setError(err.message);
-      toast.error(err.message);
+      handleError(err, 'Error al agregar el producto');
       throw err;
     } finally {
       setLoading(false);
     }
-  };
+  }, [validateProductData, handleError, handleSuccess]);
 
-  const updateProduct = async (id, productData) => {
+  const updateProduct = useCallback(async (id, productData) => {
     setLoading(true);
     setError(null);
     
     try {
       // Validaciones
-      if (!productData.title || productData.title.trim().length === 0) {
-        throw new Error('El nombre del producto es obligatorio');
+      const validationErrors = validateProductData(productData);
+      if (validationErrors.length > 0) {
+        throw new Error(validationErrors.join(', '));
       }
-      
-      if (!productData.price || productData.price <= 0) {
-        throw new Error('El precio debe ser mayor a 0');
-      }
-      
-      if (!productData.description || productData.description.length < 10) {
-        throw new Error('La descripción debe tener al menos 10 caracteres');
+
+      // Verificar que el producto existe
+      const existingProduct = products.find(p => p.id === id);
+      if (!existingProduct) {
+        throw new Error('Producto no encontrado');
       }
 
       // Simulación de llamada a API
@@ -132,38 +150,46 @@ export function ProductProvider({ children }) {
         product.id === id ? { ...product, ...productData } : product
       ));
       
-      toast.success('Producto actualizado exitosamente');
+      handleSuccess('Producto actualizado exitosamente');
     } catch (err) {
-      setError(err.message);
-      toast.error(err.message);
+      handleError(err, 'Error al actualizar el producto');
       throw err;
     } finally {
       setLoading(false);
     }
-  };
+  }, [products, validateProductData, handleError, handleSuccess]);
 
-  const deleteProduct = async (id) => {
+  const deleteProduct = useCallback(async (id) => {
     setLoading(true);
     setError(null);
     
     try {
+      // Verificar que el producto existe
+      const existingProduct = products.find(p => p.id === id);
+      if (!existingProduct) {
+        throw new Error('Producto no encontrado');
+      }
+
       // Simulación de llamada a API
       await new Promise(resolve => setTimeout(resolve, 500));
       
       setProducts(prev => prev.filter(product => product.id !== id));
-      toast.success('Producto eliminado exitosamente');
+      handleSuccess('Producto eliminado exitosamente');
     } catch (err) {
-      setError('Error al eliminar el producto');
-      toast.error('Error al eliminar el producto');
+      handleError(err, 'Error al eliminar el producto');
       throw err;
     } finally {
       setLoading(false);
     }
-  };
+  }, [products, handleError, handleSuccess]);
 
-  const getProductById = (id) => {
+  const getProductById = useCallback((id) => {
     return products.find(product => product.id === parseInt(id));
-  };
+  }, [products]);
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
   return (
     <ProductContext.Provider value={{
@@ -174,7 +200,8 @@ export function ProductProvider({ children }) {
       addProduct,
       updateProduct,
       deleteProduct,
-      getProductById
+      getProductById,
+      clearError
     }}>
       {children}
     </ProductContext.Provider>

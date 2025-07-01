@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Save, Plus } from 'lucide-react';
+import { X, Save, Plus, AlertCircle } from 'lucide-react';
 import { Modal, Button, Form, Alert } from 'react-bootstrap';
 
 const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
@@ -14,6 +14,7 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [touched, setTouched] = useState({});
 
   const isEditing = !!product;
 
@@ -40,29 +41,93 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
       });
     }
     setErrors({});
+    setTouched({});
   }, [product, show]);
+
+  const validateField = (name, value) => {
+    switch (name) {
+      case 'title':
+        if (!value.trim()) {
+          return 'El nombre del producto es obligatorio';
+        }
+        if (value.trim().length < 3) {
+          return 'El nombre debe tener al menos 3 caracteres';
+        }
+        return '';
+      
+      case 'price':
+        if (!value) {
+          return 'El precio es obligatorio';
+        }
+        if (isNaN(value) || parseFloat(value) <= 0) {
+          return 'El precio debe ser mayor a 0';
+        }
+        if (parseFloat(value) > 999.99) {
+          return 'El precio no puede ser mayor a $999.99';
+        }
+        return '';
+      
+      case 'description':
+        if (!value.trim()) {
+          return 'La descripción es obligatoria';
+        }
+        if (value.trim().length < 10) {
+          return 'La descripción debe tener al menos 10 caracteres';
+        }
+        if (value.trim().length > 500) {
+          return 'La descripción no puede exceder 500 caracteres';
+        }
+        return '';
+      
+      case 'genre':
+        if (!value) {
+          return 'El género es obligatorio';
+        }
+        return '';
+      
+      case 'platform':
+        if (!value) {
+          return 'La plataforma es obligatoria';
+        }
+        return '';
+      
+      case 'image':
+        if (value && !isValidUrl(value)) {
+          return 'Por favor ingresa una URL válida';
+        }
+        return '';
+      
+      default:
+        return '';
+    }
+  };
+
+  const isValidUrl = (string) => {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
 
   const validateForm = () => {
     const newErrors = {};
+    const fields = ['title', 'price', 'description', 'genre', 'platform'];
+    
+    fields.forEach(field => {
+      const error = validateField(field, formData[field]);
+      if (error) {
+        newErrors[field] = error;
+      }
+    });
 
-    if (!formData.title.trim()) {
-      newErrors.title = 'El nombre del producto es obligatorio';
-    }
-
-    if (!formData.price || formData.price <= 0) {
-      newErrors.price = 'El precio debe ser mayor a 0';
-    }
-
-    if (!formData.description || formData.description.length < 10) {
-      newErrors.description = 'La descripción debe tener al menos 10 caracteres';
-    }
-
-    if (!formData.genre.trim()) {
-      newErrors.genre = 'El género es obligatorio';
-    }
-
-    if (!formData.platform.trim()) {
-      newErrors.platform = 'La plataforma es obligatoria';
+    // Validar URL de imagen si se proporciona
+    if (formData.image) {
+      const imageError = validateField('image', formData.image);
+      if (imageError) {
+        newErrors.image = imageError;
+      }
     }
 
     setErrors(newErrors);
@@ -97,13 +162,37 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
       [name]: value
     }));
     
-    // Limpiar error del campo cuando el usuario empiece a escribir
-    if (errors[name]) {
+    // Validar campo en tiempo real si ya ha sido tocado
+    if (touched[name]) {
+      const error = validateField(name, value);
       setErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: error
       }));
     }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched(prev => ({
+      ...prev,
+      [name]: true
+    }));
+    
+    const error = validateField(name, value);
+    setErrors(prev => ({
+      ...prev,
+      [name]: error
+    }));
+  };
+
+  const isFormValid = () => {
+    return !Object.values(errors).some(error => error) &&
+           formData.title.trim() &&
+           formData.price &&
+           formData.description.trim() &&
+           formData.genre &&
+           formData.platform;
   };
 
   return (
@@ -125,12 +214,17 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   isInvalid={!!errors.title}
                   placeholder="Ej: The Legend of Zelda"
+                  aria-describedby="title-help"
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.title}
                 </Form.Control.Feedback>
+                <Form.Text id="title-help" className="text-muted">
+                  Mínimo 3 caracteres
+                </Form.Text>
               </Form.Group>
             </div>
             
@@ -142,14 +236,20 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   isInvalid={!!errors.price}
                   placeholder="59.99"
                   step="0.01"
                   min="0"
+                  max="999.99"
+                  aria-describedby="price-help"
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.price}
                 </Form.Control.Feedback>
+                <Form.Text id="price-help" className="text-muted">
+                  Máximo $999.99
+                </Form.Text>
               </Form.Group>
             </div>
           </div>
@@ -162,14 +262,16 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
               name="description"
               value={formData.description}
               onChange={handleChange}
+              onBlur={handleBlur}
               isInvalid={!!errors.description}
               placeholder="Describe el juego en al menos 10 caracteres..."
+              aria-describedby="description-help"
             />
             <Form.Control.Feedback type="invalid">
               {errors.description}
             </Form.Control.Feedback>
-            <Form.Text className="text-muted">
-              Mínimo 10 caracteres
+            <Form.Text id="description-help" className="text-muted">
+              {formData.description.length}/500 caracteres (mínimo 10)
             </Form.Text>
           </Form.Group>
 
@@ -181,7 +283,9 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
                   name="genre"
                   value={formData.genre}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   isInvalid={!!errors.genre}
+                  aria-describedby="genre-help"
                 >
                   <option value="">Seleccionar género</option>
                   <option value="Acción">Acción</option>
@@ -194,10 +298,15 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
                   <option value="Simulación">Simulación</option>
                   <option value="Terror">Terror</option>
                   <option value="Indie">Indie</option>
+                  <option value="Plataformas">Plataformas</option>
+                  <option value="FPS">FPS</option>
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
                   {errors.genre}
                 </Form.Control.Feedback>
+                <Form.Text id="genre-help" className="text-muted">
+                  Selecciona el género principal del juego
+                </Form.Text>
               </Form.Group>
             </div>
             
@@ -208,7 +317,9 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
                   name="platform"
                   value={formData.platform}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   isInvalid={!!errors.platform}
+                  aria-describedby="platform-help"
                 >
                   <option value="">Seleccionar plataforma</option>
                   <option value="PC">PC</option>
@@ -222,6 +333,9 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
                 <Form.Control.Feedback type="invalid">
                   {errors.platform}
                 </Form.Control.Feedback>
+                <Form.Text id="platform-help" className="text-muted">
+                  Selecciona la plataforma principal
+                </Form.Text>
               </Form.Group>
             </div>
           </div>
@@ -235,9 +349,15 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
                   name="image"
                   value={formData.image}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  isInvalid={!!errors.image}
                   placeholder="https://ejemplo.com/imagen.jpg"
+                  aria-describedby="image-help"
                 />
-                <Form.Text className="text-muted">
+                <Form.Control.Feedback type="invalid">
+                  {errors.image}
+                </Form.Control.Feedback>
+                <Form.Text id="image-help" className="text-muted">
                   Opcional. Si no se proporciona, se usará una imagen por defecto.
                 </Form.Text>
               </Form.Group>
@@ -251,13 +371,21 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
                   name="releaseDate"
                   value={formData.releaseDate}
                   onChange={handleChange}
+                  aria-describedby="release-help"
                 />
-                <Form.Text className="text-muted">
-                  Opcional
+                <Form.Text id="release-help" className="text-muted">
+                  Opcional. Si no se especifica, se usará la fecha actual.
                 </Form.Text>
               </Form.Group>
             </div>
           </div>
+
+          {Object.keys(errors).length > 0 && (
+            <Alert variant="warning" className="mt-3">
+              <AlertCircle size={16} className="me-2" />
+              Por favor corrige los errores antes de continuar.
+            </Alert>
+          )}
         </Modal.Body>
         
         <Modal.Footer>
@@ -267,7 +395,7 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
           <Button 
             variant="danger" 
             type="submit" 
-            disabled={isLoading}
+            disabled={isLoading || !isFormValid()}
           >
             {isLoading ? (
               <>

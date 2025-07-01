@@ -2,9 +2,12 @@
 
 import { useAuth } from "../context/AuthContext"
 import { Navigate } from "react-router-dom"
+import { useFavorites } from "../context/FavoritesContext"
+import ProductCard from "../components/ProductCard"
 
 const Perfil = () => {
   const { isAuthenticated, user } = useAuth();
+  const { favorites, removeFavorite } = useFavorites();
 
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
@@ -42,18 +45,25 @@ const Perfil = () => {
 
               <div className="mb-4">
                 <h3 className="h5 mb-3">Juegos Favoritos</h3>
-                <div className="alert alert-info">
-                  No hay juegos favoritos guardados.
-                </div>
-              </div>
-
-              <div className="d-grid gap-2">
-                <button className="btn btn-primary">
-                  Actualizar Perfil
-                </button>
-                <button className="btn btn-outline-danger">
-                  Eliminar Cuenta
-                </button>
+                {favorites.length === 0 ? (
+                  <div className="alert alert-info">
+                    No hay juegos favoritos guardados.
+                  </div>
+                ) : (
+                  <div className="row g-3">
+                    {favorites.map((game) => (
+                      <div className="col-6 col-md-4 col-lg-3" key={game.id}>
+                        <ProductCard 
+                          product={game} 
+                          addToCart={() => {}} 
+                          removeFromCart={() => {}} 
+                          cartItems={[]} 
+                          updateQuantity={() => {}} 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

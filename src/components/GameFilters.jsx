@@ -15,8 +15,7 @@ const GameFilters = ({
   hasActiveFilters,
   platforms,
   genres,
-  filteredCount,
-  totalCount,
+  totalGames,
   currentPage,
   setCurrentPage,
   totalPages,
@@ -29,7 +28,7 @@ const GameFilters = ({
 
   const renderPaginationItems = () => {
     const items = [];
-    const maxVisiblePages = 5;
+    const maxVisiblePages = totalPages > 10 ? 3 : 5; // Menos páginas visibles si hay muchas
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
@@ -42,6 +41,7 @@ const GameFilters = ({
         key="first"
         onClick={() => handlePageChange(1)}
         disabled={currentPage === 1}
+        title="Primera página"
       />
     );
 
@@ -50,8 +50,16 @@ const GameFilters = ({
         key="prev"
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
+        title="Página anterior"
       />
     );
+
+    // Mostrar "..." si hay páginas antes del rango visible
+    if (startPage > 1) {
+      items.push(
+        <Pagination.Ellipsis key="start-ellipsis" disabled />
+      );
+    }
 
     for (let number = startPage; number <= endPage; number++) {
       items.push(
@@ -65,11 +73,19 @@ const GameFilters = ({
       );
     }
 
+    // Mostrar "..." si hay páginas después del rango visible
+    if (endPage < totalPages) {
+      items.push(
+        <Pagination.Ellipsis key="end-ellipsis" disabled />
+      );
+    }
+
     items.push(
       <Pagination.Next
         key="next"
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
+        title="Página siguiente"
       />
     );
 
@@ -78,6 +94,7 @@ const GameFilters = ({
         key="last"
         onClick={() => handlePageChange(totalPages)}
         disabled={currentPage === totalPages}
+        title="Última página"
       />
     );
 
@@ -162,14 +179,36 @@ const GameFilters = ({
         </div>
       </div>
 
-      {totalCount > 0 && (
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <p className="mb-0 text-muted small">
-            Mostrando <span className="fw-bold">{currentPageGames}</span> de <span className="fw-bold">{totalCount}</span> juegos
-          </p>
-          <Pagination size="sm" className="mb-0">
-            {renderPaginationItems()}
-          </Pagination>
+      {/* Paginación */}
+      {totalGames > 0 && (
+        <div className="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded border">
+          <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2">
+            <p className="mb-0 text-muted small">
+              Mostrando <span className="fw-bold text-primary">{currentPageGames || 0}</span> de <span className="fw-bold text-primary">{totalGames || 0}</span> juegos
+            </p>
+            {totalPages > 1 && (
+              <p className="mb-0 text-muted small">
+                Página <span className="fw-bold text-primary">{currentPage || 1}</span> de <span className="fw-bold text-primary">{totalPages || 1}</span>
+                {totalPages > 10 && (
+                  <span className="ms-2 text-warning">
+                    ⚠️ Muchas páginas ({totalPages})
+                  </span>
+                )}
+              </p>
+            )}
+          </div>
+          {totalPages > 1 && (
+            <div className="d-flex flex-column align-items-end">
+              <Pagination size="sm" className="mb-0">
+                {renderPaginationItems()}
+              </Pagination>
+              {totalPages > 10 && (
+                <small className="text-muted mt-1">
+                  Usa los botones de navegación para moverte rápido
+                </small>
+              )}
+            </div>
+          )}
         </div>
       )}
     </>

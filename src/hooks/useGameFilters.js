@@ -1,27 +1,24 @@
 import { useReducer, useMemo, useCallback, useEffect } from 'react';
+import { usePagination } from './usePagination';
 
 const initialState = {
   filteredGames: [],
   searchTerm: "",
   selectedPlatform: "",
   selectedGenre: "",
-  sortBy: "title",
-  currentPage: 1,
-  gamesPerPage: 12
+  sortBy: "title"
 };
 
 function gameFiltersReducer(state, action) {
   switch (action.type) {
     case 'SET_SEARCH_TERM':
-      return { ...state, searchTerm: action.payload, currentPage: 1 };
+      return { ...state, searchTerm: action.payload };
     case 'SET_PLATFORM':
-      return { ...state, selectedPlatform: action.payload, currentPage: 1 };
+      return { ...state, selectedPlatform: action.payload };
     case 'SET_GENRE':
-      return { ...state, selectedGenre: action.payload, currentPage: 1 };
+      return { ...state, selectedGenre: action.payload };
     case 'SET_SORT':
-      return { ...state, sortBy: action.payload, currentPage: 1 };
-    case 'SET_PAGE':
-      return { ...state, currentPage: action.payload };
+      return { ...state, sortBy: action.payload };
     case 'SET_FILTERED_GAMES':
       return { ...state, filteredGames: action.payload };
     case 'CLEAR_FILTERS':
@@ -34,21 +31,38 @@ function gameFiltersReducer(state, action) {
 export const useGameFilters = (games) => {
   const [state, dispatch] = useReducer(gameFiltersReducer, initialState);
 
+  const platforms = useMemo(() => 
+    [...new Set(games.map(game => game.platform))].sort(),
+    [games]
+  );
+
+  const genres = useMemo(() => 
+    [...new Set(games.map(game => game.genre))].sort(),
+    [games]
+  );
+
   const filterGames = useCallback(() => {
+    if (!games || games.length === 0) {
+      dispatch({ type: 'SET_FILTERED_GAMES', payload: [] });
+      return;
+    }
+
     let result = [...games];
 
     if (state.searchTerm) {
+      const searchLower = state.searchTerm.toLowerCase();
       result = result.filter(game => 
-        game.title.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
-        game.genre.toLowerCase().includes(state.searchTerm.toLowerCase())
+        game.title.toLowerCase().includes(searchLower) ||
+        game.genre.toLowerCase().includes(searchLower) ||
+        game.platform.toLowerCase().includes(searchLower)
       );
     }
 
-    if (state.selectedPlatform) {
+    if (state.selectedPlatform && state.selectedPlatform !== 'Todas las Plataformas') {
       result = result.filter(game => game.platform === state.selectedPlatform);
     }
 
-    if (state.selectedGenre) {
+    if (state.selectedGenre && state.selectedGenre !== 'Todos los Géneros') {
       result = result.filter(game => game.genre === state.selectedGenre);
     }
 
@@ -60,6 +74,12 @@ export const useGameFilters = (games) => {
           return new Date(b.release_date) - new Date(a.release_date);
         case "genre":
           return a.genre.localeCompare(b.genre);
+        case "platform":
+          return a.platform.localeCompare(b.platform);
+        case "price":
+          return (a.price || 0) - (b.price || 0);
+        case "rating":
+          return (b.rating || 0) - (a.rating || 0);
         default:
           return 0;
       }
@@ -69,58 +89,65 @@ export const useGameFilters = (games) => {
   }, [games, state.searchTerm, state.selectedPlatform, state.selectedGenre, state.sortBy]);
 
   useEffect(() => {
-    if (games && games.length > 0) {
-      filterGames();
-    }
-  }, [games, filterGames]);
+    filterGames();
+  }, [filterGames]);
 
-  const clearFilters = useCallback(() => {
-    dispatch({ type: 'CLEAR_FILTERS' });
-  }, []);
+  // Usar el hook unificado de paginación
+  const pagination = usePagination(state.filteredGames, 12);
 
   const hasActiveFilters = useMemo(() => 
-    state.searchTerm || state.selectedPlatform || state.selectedGenre || state.sortBy !== "title",
+    state.searchTerm || 
+    (state.selectedPlatform && state.selectedPlatform !== 'Todas las Plataformas') || 
+    (state.selectedGenre && state.selectedGenre !== 'Todos los Géneros') || 
+    state.sortBy !== "title",
     [state.searchTerm, state.selectedPlatform, state.selectedGenre, state.sortBy]
   );
 
-  const platforms = useMemo(() => 
-    [...new Set(games.map(game => game.platform))],
-    [games]
-  );
+  const setSearchTerm = useCallback((value) => {
+    dispatch({ type: 'SET_SEARCH_TERM', payload: value });
+    pagination.resetToFirstPage();
+  }, [pagination]);
 
-  const genres = useMemo(() => 
-    [...new Set(games.map(game => game.genre))],
-    [games]
-  );
+  const setSelectedPlatform = useCallback((value) => {
+    dispatch({ type: 'SET_PLATFORM', payload: value });
+    pagination.resetToFirstPage();
+  }, [pagination]);
 
-  const totalPages = useMemo(() => 
-    Math.ceil(state.filteredGames.length / state.gamesPerPage),
-    [state.filteredGames.length, state.gamesPerPage]
-  );
+  const setSelectedGenre = useCallback((value) => {
+    dispatch({ type: 'SET_GENRE', payload: value });
+    pagination.resetToFirstPage();
+  }, [pagination]);
 
-  const paginatedGames = useMemo(() => {
-    const startIndex = (state.currentPage - 1) * state.gamesPerPage;
-    return state.filteredGames.slice(startIndex, startIndex + state.gamesPerPage);
-  }, [state.filteredGames, state.currentPage, state.gamesPerPage]);
+  const setSortBy = useCallback((value) => {
+    dispatch({ type: 'SET_SORT', payload: value });
+    pagination.resetToFirstPage();
+  }, [pagination]);
+
+  const clearFilters = useCallback(() => {
+    dispatch({ type: 'CLEAR_FILTERS' });
+    pagination.resetToFirstPage();
+  }, [pagination]);
 
   return {
-    filteredGames: paginatedGames,
+    filteredGames: pagination.paginatedItems,
+    totalGames: pagination.totalItems,
+    currentPageGames: pagination.currentPageItems,
     searchTerm: state.searchTerm,
-    setSearchTerm: (value) => dispatch({ type: 'SET_SEARCH_TERM', payload: value }),
+    setSearchTerm,
     selectedPlatform: state.selectedPlatform,
-    setSelectedPlatform: (value) => dispatch({ type: 'SET_PLATFORM', payload: value }),
+    setSelectedPlatform,
     selectedGenre: state.selectedGenre,
-    setSelectedGenre: (value) => dispatch({ type: 'SET_GENRE', payload: value }),
+    setSelectedGenre,
     sortBy: state.sortBy,
-    setSortBy: (value) => dispatch({ type: 'SET_SORT', payload: value }),
-    clearFilters,
-    hasActiveFilters,
+    setSortBy,
+    currentPage: pagination.currentPage,
+    setCurrentPage: pagination.setCurrentPage,
+    totalPages: pagination.totalPages,
+    hasNextPage: pagination.hasNextPage,
+    hasPrevPage: pagination.hasPrevPage,
     platforms,
     genres,
-    currentPage: state.currentPage,
-    setCurrentPage: (value) => dispatch({ type: 'SET_PAGE', payload: value }),
-    totalPages,
-    totalGames: state.filteredGames.length,
-    currentPageGames: paginatedGames.length
+    hasActiveFilters,
+    clearFilters
   };
 }; 

@@ -1,7 +1,7 @@
 "use client"
 
 import { Link, useNavigate } from "react-router-dom"
-import { ShoppingCart, User, LogOut, Settings, Crown } from "lucide-react"
+import { FaShoppingCart, FaUser, FaSignOutAlt, FaCog, FaCrown, FaHome, FaTags, FaStar, FaBars, FaGraduationCap } from "react-icons/fa"
 import { useAuth } from "../context/AuthContext"
 import { useState } from "react"
 import { Dropdown } from "react-bootstrap"
@@ -9,7 +9,6 @@ import { Dropdown } from "react-bootstrap"
 const Header = ({ cartCount, toggleCart, toggleLogin }) => {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
-  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleLoginClick = () => {
     if (!isAuthenticated) {
@@ -23,98 +22,126 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
   };
 
   return (
-    <header className="fixed-top bg-dark text-white">
-      <nav className="navbar navbar-expand-lg navbar-dark">
-        <div className="container">
-          <Link className="navbar-brand" to="/">
-            🎮 Mi Nuevo Vicio
-          </Link>
+    <>
+      {/* Banner educativo sticky - Información del proyecto */}
+      <div 
+        className="fixed-top bg-primary text-white py-2 px-3 text-center" 
+        style={{ 
+          fontSize: '0.85rem', 
+          zIndex: 1031,
+          lineHeight: '1.4'
+        }}
+        role="banner"
+        aria-label="Información del proyecto educativo"
+      >
+        <FaGraduationCap className="me-2" aria-hidden="true" />
+        <strong>Proyecto Educativo:</strong> 
+        <span className="d-none d-sm-inline"> Este es un ejemplo de ecommerce desarrollado para fines de aprendizaje.</span>
+        <span className="d-sm-none"> Ecommerce educativo.</span>
+        <span className="d-none d-md-inline"> Todos los juegos mostrados son gratuitos y provienen de la API pública de FreeToGame.</span>
+      </div>
+      
+      {/* Header principal con navegación */}
+      <header 
+        className="fixed-top bg-dark text-white" 
+        style={{ top: '35px', zIndex: 1030 }}
+        role="banner"
+        aria-label="Navegación principal"
+      >
+        <nav className="navbar navbar-expand-lg navbar-dark" role="navigation" aria-label="Navegación principal">
+          <div className="container">
+            {/* Logo/Brand - Responsive (MNV en móvil, texto completo en desktop) */}
+            <Link 
+              className="navbar-brand d-flex align-items-center flex-grow-1" 
+              to="/"
+              aria-label="Ir a la página de inicio"
+            >
+              <FaHome className="me-2" aria-hidden="true" />
+              <span className="d-none d-sm-inline">Mi Nuevo Vicio</span>
+              <span className="d-sm-none">MNV</span>
+            </Link>
 
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav me-auto">
-              <li className="nav-item">
-                <Link className="nav-link" to="/">
-                  Inicio
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/ofertas">
-                  Ofertas
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/infaltables">
-                  Infaltables
-                </Link>
-              </li>
-            </ul>
-
-            <div className="d-flex align-items-center">
+            {/* Acciones móviles - Siempre visibles en pantallas pequeñas */}
+            <div className="d-flex align-items-center d-lg-none" role="group" aria-label="Acciones móviles">
               <button
                 className="btn btn-outline-light me-2 position-relative"
                 onClick={toggleCart}
-                title="Carrito de compras"
+                aria-label={`Carrito de compras con ${cartCount} artículos`}
+                aria-describedby="cart-count-mobile"
+                style={{ minWidth: '44px', minHeight: '44px' }}
               >
-                <ShoppingCart size={20} />
+                <FaShoppingCart size={18} aria-hidden="true" />
                 {cartCount > 0 && (
                   <span
+                    id="cart-count-mobile"
                     className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
                     style={{ fontSize: "0.7rem" }}
+                    aria-label={`${cartCount} artículos en el carrito`}
                   >
                     {cartCount}
                   </span>
                 )}
               </button>
 
+              {/* Dropdown de usuario para móvil */}
               {isAuthenticated ? (
                 <Dropdown>
                   <Dropdown.Toggle 
                     variant="outline-light" 
-                    id="dropdown-user"
+                    id="dropdown-user-mobile"
                     className="d-flex align-items-center"
+                    aria-label={`Menú de usuario para ${user?.name || user?.email}`}
+                    aria-expanded="false"
+                    style={{ minWidth: '44px', minHeight: '44px' }}
                   >
-                    <User size={16} className="me-2" />
-                    {user?.name || user?.email}
-                    {user?.role === 'admin' && (
-                      <Crown size={14} className="ms-2 text-warning" />
-                    )}
+                    <FaUser size={16} aria-hidden="true" />
                   </Dropdown.Toggle>
 
-                  <Dropdown.Menu>
-                    <Dropdown.Header>
+                  <Dropdown.Menu role="menu" aria-label="Opciones de usuario" className="dropdown-menu-end">
+                    <Dropdown.Header role="presentation">
                       <small className="text-muted">
-                        {user?.email}
+                        <span aria-label={`Email: ${user?.email}`}>
+                          {user?.email}
+                        </span>
                         {user?.role === 'admin' && (
-                          <span className="badge bg-warning text-dark ms-2">Admin</span>
+                          <span 
+                            className="badge bg-warning text-dark ms-2" 
+                            aria-label="Rol de administrador"
+                          >
+                            Admin
+                          </span>
                         )}
                       </small>
                     </Dropdown.Header>
-                    <Dropdown.Divider />
-                    <Dropdown.Item as={Link} to="/perfil">
-                      <User size={16} className="me-2" />
+                    <Dropdown.Divider role="separator" />
+                    <Dropdown.Item 
+                      as={Link} 
+                      to="/perfil"
+                      role="menuitem"
+                      aria-label="Ir a mi perfil"
+                    >
+                      <FaUser size={16} className="me-2" aria-hidden="true" />
                       Mi Perfil
                     </Dropdown.Item>
                     {user?.role === 'admin' && (
-                      <Dropdown.Item as={Link} to="/admin">
-                        <Settings size={16} className="me-2" />
+                      <Dropdown.Item 
+                        as={Link} 
+                        to="/admin"
+                        role="menuitem"
+                        aria-label="Ir al panel de administración"
+                      >
+                        <FaCog size={16} className="me-2" aria-hidden="true" />
                         Panel Admin
                       </Dropdown.Item>
                     )}
-                    <Dropdown.Divider />
-                    <Dropdown.Item onClick={handleLogout} className="text-danger">
-                      <LogOut size={16} className="me-2" />
+                    <Dropdown.Divider role="separator" />
+                    <Dropdown.Item 
+                      onClick={handleLogout} 
+                      className="text-danger"
+                      role="menuitem"
+                      aria-label="Cerrar sesión"
+                    >
+                      <FaSignOutAlt size={16} className="me-2" aria-hidden="true" />
                       Cerrar Sesión
                     </Dropdown.Item>
                   </Dropdown.Menu>
@@ -123,16 +150,175 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
                 <button
                   className="btn btn-outline-light"
                   onClick={handleLoginClick}
-                  title="Iniciar sesión"
+                  aria-label="Iniciar sesión"
+                  style={{ minWidth: '44px', minHeight: '44px' }}
                 >
-                  <User size={20} />
+                  <FaUser size={18} aria-hidden="true" />
                 </button>
               )}
             </div>
+
+            {/* Botón hamburger para navegación móvil */}
+            <button
+              className="navbar-toggler ms-2"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarNav"
+              aria-controls="navbarNav"
+              aria-expanded="false"
+              aria-label="Alternar navegación"
+              style={{ minWidth: '44px', minHeight: '44px' }}
+            >
+              <span className="navbar-toggler-icon" aria-hidden="true"></span>
+            </button>
+
+            {/* Navegación colapsable - Menú principal */}
+            <div className="collapse navbar-collapse" id="navbarNav" role="menubar">
+              <ul className="navbar-nav me-auto" role="menubar">
+                <li className="nav-item" role="none">
+                  <Link 
+                    className="nav-link d-flex align-items-center justify-content-center" 
+                    to="/"
+                    role="menuitem"
+                    aria-label="Ir a la página de inicio"
+                    style={{ minHeight: '44px' }}
+                  >
+                    <FaHome size={18} aria-hidden="true" />
+                  </Link>
+                </li>
+                <li className="nav-item" role="none">
+                  <Link 
+                    className="nav-link d-flex align-items-center justify-content-center" 
+                    to="/ofertas"
+                    role="menuitem"
+                    aria-label="Ver ofertas de juegos"
+                    style={{ minHeight: '44px' }}
+                  >
+                    <FaTags size={18} aria-hidden="true" />
+                  </Link>
+                </li>
+                <li className="nav-item" role="none">
+                  <Link 
+                    className="nav-link d-flex align-items-center justify-content-center" 
+                    to="/infaltables"
+                    role="menuitem"
+                    aria-label="Ver juegos infaltables"
+                    style={{ minHeight: '44px' }}
+                  >
+                    <FaStar size={18} aria-hidden="true" />
+                  </Link>
+                </li>
+              </ul>
+
+              {/* Acciones de escritorio - Ocultas en móvil */}
+              <div className="d-none d-lg-flex align-items-center" role="group" aria-label="Acciones de escritorio">
+                <button
+                  className="btn btn-outline-light me-3 position-relative"
+                  onClick={toggleCart}
+                  aria-label={`Carrito de compras con ${cartCount} artículos`}
+                  aria-describedby="cart-count-desktop"
+                  style={{ minHeight: '44px' }}
+                >
+                  <FaShoppingCart size={20} aria-hidden="true" />
+                  {cartCount > 0 && (
+                    <span
+                      id="cart-count-desktop"
+                      className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                      style={{ fontSize: "0.7rem" }}
+                      aria-label={`${cartCount} artículos en el carrito`}
+                    >
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Dropdown de usuario para escritorio */}
+                {isAuthenticated ? (
+                  <Dropdown>
+                    <Dropdown.Toggle 
+                      variant="outline-light" 
+                      id="dropdown-user-desktop"
+                      className="d-flex align-items-center justify-content-center"
+                      aria-label={`Menú de usuario para ${user?.name || user?.email}`}
+                      aria-expanded="false"
+                      style={{ minHeight: '44px' }}
+                    >
+                      <FaUser size={16} aria-hidden="true" />
+                      {user?.role === 'admin' && (
+                        <FaCrown 
+                          size={14} 
+                          className="ms-2 text-warning" 
+                          aria-hidden="true"
+                          title="Usuario administrador"
+                        />
+                      )}
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu role="menu" aria-label="Opciones de usuario" className="dropdown-menu-end">
+                      <Dropdown.Header role="presentation">
+                        <small className="text-muted">
+                          <span aria-label={`Email: ${user?.email}`}>
+                            {user?.email}
+                          </span>
+                          {user?.role === 'admin' && (
+                            <span 
+                              className="badge bg-warning text-dark ms-2" 
+                              aria-label="Rol de administrador"
+                            >
+                              Admin
+                            </span>
+                          )}
+                        </small>
+                      </Dropdown.Header>
+                      <Dropdown.Divider role="separator" />
+                      <Dropdown.Item 
+                        as={Link} 
+                        to="/perfil"
+                        role="menuitem"
+                        aria-label="Ir a mi perfil"
+                      >
+                        <FaUser size={16} className="me-2" aria-hidden="true" />
+                        Mi Perfil
+                      </Dropdown.Item>
+                      {user?.role === 'admin' && (
+                        <Dropdown.Item 
+                          as={Link} 
+                          to="/admin"
+                          role="menuitem"
+                          aria-label="Ir al panel de administración"
+                        >
+                          <FaCog size={16} className="me-2" aria-hidden="true" />
+                          Panel Admin
+                        </Dropdown.Item>
+                      )}
+                      <Dropdown.Divider role="separator" />
+                      <Dropdown.Item 
+                        onClick={handleLogout} 
+                        className="text-danger"
+                        role="menuitem"
+                        aria-label="Cerrar sesión"
+                      >
+                        <FaSignOutAlt size={16} className="me-2" aria-hidden="true" />
+                        Cerrar Sesión
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                ) : (
+                  <button
+                    className="btn btn-outline-light"
+                    onClick={handleLoginClick}
+                    aria-label="Iniciar sesión"
+                    style={{ minHeight: '44px' }}
+                  >
+                    <FaUser size={20} aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      </nav>
-    </header>
+        </nav>
+      </header>
+    </>
   )
 }
 
