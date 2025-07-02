@@ -70,7 +70,11 @@ cd mi-nuevo-vicio
 npm install
 ```
 
-3. Inicia el servidor de desarrollo
+3. **Configura MockAPI.io (Opcional pero recomendado)**
+   - Sigue las instrucciones en `MOCKAPI_SETUP.md`
+   - Esto permitirá que el formulario de productos funcione con solicitudes POST reales
+
+4. Inicia el servidor de desarrollo
 ```bash
 npm run dev
 ```
@@ -109,21 +113,23 @@ npm run dev
     - Descripción mínima de 10 caracteres (máximo 500)
     - Género y plataforma obligatorios
     - Validación de URL de imagen
-  - Envío de datos a MockAPI mediante solicitudes POST
+  - **Envío de datos a MockAPI mediante solicitudes POST** ✅ IMPLEMENTADO
   - Validación en tiempo real con feedback visual
+  - **Configuración de MockAPI.io**: Ver archivo `MOCKAPI_SETUP.md` para instrucciones
 
 - **Edición y Eliminación de Productos**
-  - Edición de productos utilizando MockAPI y Context API
+  - Edición de productos utilizando MockAPI y Context API ✅ IMPLEMENTADO
   - Mensajes de error y confirmaciones al usuario
   - Modal de confirmación antes de eliminar un producto
   - Búsqueda y filtrado avanzado en el panel de administración
   - Ordenamiento por múltiples criterios
 
 - **Manejo de Errores**
-  - Mensajes de error en pantalla para problemas con la API
+  - Mensajes de error en pantalla para problemas con la API ✅ IMPLEMENTADO
   - Estados de carga y error al obtener los productos
   - Validación robusta con manejo de excepciones
   - Feedback visual para todas las operaciones
+  - **Fallback automático**: Si MockAPI no está disponible, usa datos locales
 
 ### ✅ Requerimiento #3: Optimización de Diseño y Responsividad
 - **Diseño Responsivo con Bootstrap**
@@ -253,6 +259,17 @@ Para probar la aplicación, puedes usar estas credenciales:
 
 La aplicación está lista para ser desplegada en cualquier plataforma de hosting estático como:
 - Vercel
+
+## 🔧 Configuración de MockAPI.io
+
+Para que el formulario de productos funcione con solicitudes POST reales:
+
+1. **Lee la documentación**: Consulta `MOCKAPI_SETUP.md` para instrucciones detalladas
+2. **Crea un proyecto**: Regístrate en [MockAPI.io](https://mockapi.io/) y crea un proyecto
+3. **Configura el código**: Actualiza `src/config/api.js` con tu Project ID
+4. **Prueba la funcionalidad**: Agrega productos y verifica las solicitudes en DevTools
+
+**Nota**: Sin MockAPI.io configurado, la aplicación funciona con datos locales como fallback.
 
 Para construir la aplicación para producción:
 ```bash

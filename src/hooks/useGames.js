@@ -79,11 +79,9 @@ export const useGames = () => {
           url = `${proxy}${encodeURIComponent(targetUrl)}`;
         }
         
-        console.log(`Intentando proxy: ${proxy}`);
         const data = await fetchWithTimeout(url, 3000);
         
         if (data && data.length > 0) {
-          console.log(`Proxy exitoso: ${proxy}`);
           return data;
         }
       } catch (err) {
@@ -105,13 +103,10 @@ export const useGames = () => {
     
     if (isDevelopment) {
       try {
-        console.log("Modo desarrollo: cargando datos mock...");
         const mockResponse = await fetchMockGames(800);
-        console.log("Datos mock cargados:", mockResponse.data);
         setGames(mockResponse.data);
         setUsingMockData(true);
         setError("🛠️ Modo desarrollo: usando datos de demostración");
-        console.log(`Cargados ${mockResponse.data.length} juegos mock`);
       } catch (mockErr) {
         console.error("Error al cargar datos mock:", mockErr);
         setError("❌ Error al cargar datos de demostración");
@@ -124,33 +119,18 @@ export const useGames = () => {
     
     // En producción, intentar API real primero
     try {
-      console.log("Modo producción: intentando API FreeToGame...");
       const data = await attemptFetchFromProxies();
-      console.log("Datos de API cargados:", {
-        totalGames: data.length,
-        sampleGame: data[0],
-        gamesPerPage: 12,
-        totalPages: Math.ceil(data.length / 12)
-      });
       setGames(data);
       setUsingMockData(false);
-      console.log(`Cargados ${data.length} juegos desde API`);
     } catch (err) {
       console.warn("API no disponible, usando datos mock:", err.message);
       
       // Fallback a datos mock en producción también
       try {
         const mockResponse = await fetchMockGames(1000);
-        console.log("Datos mock cargados:", {
-          totalGames: mockResponse.data.length,
-          sampleGame: mockResponse.data[0],
-          gamesPerPage: 12,
-          totalPages: Math.ceil(mockResponse.data.length / 12)
-        });
         setGames(mockResponse.data);
         setUsingMockData(true);
         setError("⚠️ Usando datos de demostración - API FreeToGame no disponible");
-        console.log(`Cargados ${mockResponse.data.length} juegos mock`);
       } catch (mockErr) {
         console.error("Error al cargar datos mock:", mockErr);
         setError("❌ Error al cargar datos de demostración");

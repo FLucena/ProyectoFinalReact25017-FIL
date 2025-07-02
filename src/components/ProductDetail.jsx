@@ -21,7 +21,6 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
       );
       
       if (foundProduct) {
-        console.log("Found basic game info:", foundProduct);
         setProduct(foundProduct);
       }
     }
@@ -29,7 +28,6 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
 
   useEffect(() => {
     if (detailedGame) {
-      console.log("Setting detailed game info:", detailedGame);
       setProduct(detailedGame);
     }
   }, [detailedGame]);

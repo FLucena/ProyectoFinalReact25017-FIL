@@ -2,7 +2,7 @@ import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
 import path from "path"
 
-// https://vitejs.dev/config/
+// https://vitejs.dev/config/ - Configuración de Vite
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
   resolve: {
@@ -12,6 +12,13 @@ export default defineConfig(({ mode }) => ({
       "@lib": path.resolve(__dirname, "./src/lib"),
       "@hooks": path.resolve(__dirname, "./src/hooks"),
     },
+  },
+  css: {
+    preprocessorOptions: {
+      css: {
+        charset: false
+      }
+    }
   },
   server: {
     port: 3000,
@@ -35,6 +42,6 @@ export default defineConfig(({ mode }) => ({
     __DEV__: mode === 'development'
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom']
+    include: ['react', 'react-dom', 'react-router-dom', 'bootstrap']
   }
 }))

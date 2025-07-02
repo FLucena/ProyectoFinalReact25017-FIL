@@ -12,7 +12,6 @@ export const useGameDetail = (gameId) => {
       let retryCount = 0;
 
       const validateGameData = (data) => {
-        console.log("API returned game data:", data);
         
         if (!data || typeof data !== 'object') {
           console.error("Invalid response format, expected object:", data);
@@ -39,7 +38,6 @@ export const useGameDetail = (gameId) => {
       };
 
       const fetchWithTimeout = async (url, timeout) => {
-        console.log("Fetching from:", url);
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -77,7 +75,6 @@ export const useGameDetail = (gameId) => {
           const data = await fetchWithTimeout(url, TIMEOUT_MS);
           setGame(data);
           setError(null);
-          console.log("Successfully loaded game details for ID:", gameId);
         } catch (err) {
           if (err.name === 'AbortError') {
             throw new Error("La solicitud ha excedido el tiempo de espera");
@@ -103,10 +100,9 @@ export const useGameDetail = (gameId) => {
                 : `Error al cargar los detalles del juego después de ${MAX_RETRIES} intentos. Pruebe nuevamente en unos minutos.`;
               
               setError(errorMessage);
-              console.error("All retry attempts failed:", errorMessage);
+              console.error("Todos los intentos fallaron:", errorMessage);
             } else {
               const delay = Math.min(1000 * Math.pow(2, retryCount - 1), 10000);
-              console.log(`Retrying in ${delay}ms...`);
               await new Promise(resolve => setTimeout(resolve, delay));
             }
           }
