@@ -22,9 +22,9 @@ const Footer = () => {
               <strong>Proyecto Educativo:</strong> Plataforma de demostración para mostrar habilidades de desarrollo web. 
               Todos los juegos mostrados son gratuitos y provienen de la API pública de FreeToGame.
             </p>
-            <div className="alert alert-info alert-sm" role="alert">
-              <FaInfoCircle className="me-2" />
-              <small>Este es un proyecto de aprendizaje, no un ecommerce real.</small>
+            <div className="alert alert-light alert-sm border-light" role="alert" style={{ backgroundColor: 'rgba(248, 249, 250, 0.9)', borderColor: '#dee2e6' }}>
+              <FaInfoCircle className="me-2 text-info" />
+              <small className="text-dark fw-semibold">Este es un proyecto de aprendizaje, no un ecommerce real.</small>
             </div>
           </div>
 

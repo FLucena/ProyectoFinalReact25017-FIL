@@ -181,7 +181,7 @@ const GameFilters = ({
 
       {/* Paginación */}
       {totalGames > 0 && (
-        <div className="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded border">
+        <div className="d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center mb-3 p-3 bg-light rounded border gap-2 gap-sm-0 responsive-pagination-stats">
           <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2">
             <p className="mb-0 text-muted small">
               Mostrando <span className="fw-bold text-primary-accessible">{currentPageGames || 0}</span> de <span className="fw-bold text-primary-accessible">{totalGames || 0}</span> juegos
@@ -198,7 +198,7 @@ const GameFilters = ({
             )}
           </div>
           {totalPages > 1 && (
-            <div className="d-flex flex-column align-items-end">
+            <div className="d-flex flex-column align-items-end align-items-sm-end align-items-start-sm-center mt-2 mt-sm-0">
               <Pagination size="sm" className="mb-0">
                 {renderPaginationItems()}
               </Pagination>
