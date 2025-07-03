@@ -33,7 +33,17 @@ export default defineConfig(({ mode }) => ({
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
-          ui: ['react-bootstrap', 'bootstrap']
+          ui: ['react-bootstrap', 'bootstrap'],
+          icons: ['react-icons/fa', 'lucide-react'],
+          utils: ['date-fns', 'react-toastify'],
+          pages: [
+            './src/pages/Admin.jsx',
+            './src/pages/Perfil.jsx',
+            './src/pages/SobreProyecto.jsx',
+            './src/pages/Contacto.jsx',
+            './src/pages/PaymentSuccess.jsx',
+            './src/pages/PaymentFailure.jsx'
+          ]
         }
       }
     }

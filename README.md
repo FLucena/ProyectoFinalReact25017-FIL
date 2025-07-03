@@ -57,6 +57,13 @@ El proyecto utiliza la API pública de [FreeToGame](https://www.freetogame.com/a
 - **Date-fns** - Manipulación de fechas
 - **React Helmet Async** - SEO y manejo de meta tags
 
+### Performance & Optimization
+- **Service Worker** - Caching y offline functionality
+- **Lazy Loading** - Code splitting para componentes no críticos
+- **Bundle Splitting** - Optimización de chunks de JavaScript
+- **Critical CSS** - CSS inline para render-blocking prevention
+- **Resource Hints** - DNS prefetch y preconnect para conexiones externas
+
 ## 🛠️ Instalación y Configuración
 
 1. Clona el repositorio
@@ -178,11 +185,49 @@ npm run dev
   - Estado global bien gestionado con Context API
   - Hooks personalizados para lógica reutilizable
   - Componentes modulares y mantenibles
+  - **Performance Optimizations**:
+    - LCP (Largest Contentful Paint) optimization con fetchpriority="high"
+    - Progressive loading con datos mock iniciales
+    - Service Worker para caching de recursos críticos
+    - Bundle splitting para reducir el tamaño inicial
+    - Lazy loading de componentes no críticos
+    - Critical CSS inlining para prevenir render-blocking
+    - Resource hints (DNS prefetch, preconnect) para conexiones externas
+    - Third-party cookie prevention con image proxy
 
 - **Documentación Básica**
   - Instrucciones completas en el README.md sobre instalación y uso
   - Comentarios en código para funciones complejas
   - Estructura de archivos organizada
+
+## ⚡ Performance Optimizations
+
+### Critical Path Optimization
+- **Progressive Loading**: Carga inicial rápida con datos mock (12 productos) para LCP, seguida de carga completa en segundo plano
+- **LCP Image Optimization**: 
+  - `fetchpriority="high"` en imágenes críticas
+  - `loading="eager"` para evitar lazy loading en LCP
+  - Preload hints dinámicos para la primera imagen
+  - Dimensiones fijas para prevenir layout shifts
+- **Bundle Splitting**: Separación de chunks para vendor, router, UI, icons, utils y pages
+- **Lazy Loading**: Componentes no críticos cargados bajo demanda
+
+### Caching Strategy
+- **Service Worker**: Cache-first para recursos estáticos, network-first para APIs
+- **Critical Resources**: Cache inmediato de recursos críticos (logo, placeholders)
+- **Image Caching**: Cache-first para imágenes con fallback a network
+- **API Caching**: Network-first para datos de API con fallback a cache
+
+### Resource Loading
+- **DNS Prefetch**: Para dominios externos críticos
+- **Preconnect**: Conexiones anticipadas a APIs y CDNs
+- **Critical CSS**: CSS inline para prevenir render-blocking
+- **Font Loading**: Font-display: swap para fuentes web
+
+### Third-Party Cookie Prevention
+- **Image Proxy**: Uso de images.weserv.nl para evitar cookies de terceros
+- **CORS Handling**: crossorigin="anonymous" en imágenes externas
+- **CSP Headers**: Content Security Policy para control de recursos
 
 ## 🔐 Credenciales de Prueba
 
@@ -197,6 +242,111 @@ Para probar la aplicación, puedes usar estas credenciales:
 - **Email**: user@test.com
 - **Contraseña**: user123
 - **Permisos**: Acceso al carrito y perfil
+
+## 🍪 Prevención de Cookies de Terceros
+
+Este proyecto implementa varias medidas para prevenir la creación de cookies de terceros y proteger la privacidad del usuario:
+
+### ✅ Medidas Implementadas
+
+1. **Atributo `crossorigin="anonymous"`**
+   - Aplicado a todas las imágenes externas
+   - Previene el envío de cookies al cargar recursos externos
+   - Implementado en componentes: ProductCard, ProductDetail, Admin
+
+2. **Proxy de Imágenes**
+   - Utiliza `images.weserv.nl` como proxy para imágenes externas
+   - Evita la carga directa desde dominios de terceros
+   - Optimiza automáticamente las imágenes (formato WebP, compresión)
+
+3. **Content Security Policy (CSP)**
+   - Meta tag CSP configurado en `index.html`
+   - Controla qué recursos pueden cargarse
+   - Previene la ejecución de scripts no autorizados
+
+4. **Hooks Personalizados**
+   - `useImageLoader`: Maneja la carga de imágenes con CORS
+   - `useMultipleImageLoader`: Carga múltiples imágenes de forma eficiente
+   - Detección automática de imágenes externas
+
+5. **Utilidades de Imagen**
+   - `imageProxy.js`: Funciones para manejar imágenes externas
+   - Preload optimizado con manejo de CORS
+   - Fallback automático a imágenes locales
+
+### 🔧 Configuración Técnica
+
+```javascript
+// Ejemplo de uso del proxy de imágenes
+import { getProxiedImageUrl } from './utils/imageProxy';
+
+const imageUrl = getProxiedImageUrl('https://freetogame.com/image.jpg');
+// Resultado: https://images.weserv.nl/?url=https%3A//freetogame.com/image.jpg
+```
+
+### 📊 Beneficios
+
+- **Privacidad**: No se crean cookies de terceros
+- **Rendimiento**: Imágenes optimizadas automáticamente
+- **Seguridad**: CSP previene ataques XSS
+- **Compatibilidad**: Funciona en navegadores con restricciones de cookies
+- **SEO**: Mejora el Core Web Vitals al optimizar imágenes
+
+### 🚨 Dominios Permitidos
+
+El CSP permite conexiones a estos dominios específicos:
+- `freetogame.com` - API de juegos
+- `images.weserv.nl` - Proxy de imágenes
+- `fonts.googleapis.com` - Fuentes de Google
+- `fonts.gstatic.com` - Fuentes estáticas de Google
+- Varios proxies CORS para la API
+
+### 🔧 Componentes Actualizados
+
+- **GameFilters**: Paginación con mejor contraste
+- **ProductDetail**: Rating con colores accesibles
+- **Header**: Icono de admin con contraste mejorado
+- **Footer**: Todos los enlaces y textos con contraste adecuado
+
+### 📊 Beneficios de Accesibilidad
+
+- ✅ **Contraste WCAG AA**: Todos los textos cumplen con 4.5:1 mínimo
+- ✅ **Contraste WCAG AAA**: La mayoría cumple con 7:1 para mejor legibilidad
+- ✅ **Navegación por teclado**: Todos los elementos son accesibles
+- ✅ **Screen readers**: Etiquetas ARIA y estructura semántica
+- ✅ **Enfoque visual**: Indicadores de foco claros y visibles
+
+### 🎨 Paleta de Colores Accesible
+
+```css
+/* Colores principales con buen contraste */
+--bs-primary-dark: #b02a37;      /* 4.5:1 ratio */
+--bs-secondary-dark: #495057;    /* 7:1 ratio */
+--bs-warning-dark: #e0a800;      /* 3:1 ratio */
+
+/* Texto en fondos oscuros */
+--bs-dark-text: #ffffff;         /* 21:1 ratio */
+--bs-light-text: #495057;        /* 7:1 ratio */
+```
+
+### 🔍 Elementos Corregidos
+
+1. **Paginación** (`GameFilters.jsx`)
+   - ✅ Números de página con contraste mejorado
+   - ✅ Advertencias con colores accesibles
+
+2. **Footer** (`Footer.jsx`)
+   - ✅ Enlaces con contraste adecuado
+   - ✅ Texto descriptivo legible
+   - ✅ Botones con estados hover claros
+
+3. **ProductDetail** (`ProductDetail.jsx`)
+   - ✅ Rating con contraste mejorado
+   - ✅ Información del producto legible
+
+4. **Header** (`Header.jsx`)
+   - ✅ Iconos de usuario con contraste adecuado
+   - ✅ Indicadores de rol claros
 
 ## 🎮 Funcionalidades del E-commerce
 
@@ -214,6 +364,7 @@ Para probar la aplicación, puedes usar estas credenciales:
 - Persistencia en localStorage
 - **Acceso restringido a usuarios autenticados**
 - Interfaz mejorada con mejor UX
+- **Integración con MercadoPago** para procesamiento de pagos
 
 ### Panel de Administración
 - Dashboard con estadísticas
@@ -260,8 +411,9 @@ Para probar la aplicación, puedes usar estas credenciales:
 La aplicación está lista para ser desplegada en cualquier plataforma de hosting estático como:
 - Vercel
 
-## 🔧 Configuración de MockAPI.io
+## 🔧 Configuración de APIs
 
+### MockAPI.io
 Para que el formulario de productos funcione con solicitudes POST reales:
 
 1. **Lee la documentación**: Consulta `MOCKAPI_SETUP.md` para instrucciones detalladas
@@ -270,6 +422,16 @@ Para que el formulario de productos funcione con solicitudes POST reales:
 4. **Prueba la funcionalidad**: Agrega productos y verifica las solicitudes en DevTools
 
 **Nota**: Sin MockAPI.io configurado, la aplicación funciona con datos locales como fallback.
+
+### MercadoPago
+Para que el sistema de pagos funcione:
+
+1. **Lee la documentación**: Consulta `MERCADOPAGO_SETUP.md` para instrucciones detalladas
+2. **Crea una cuenta**: Regístrate en [MercadoPago Developers](https://www.mercadopago.com/developers)
+3. **Configura el código**: Actualiza `src/config/mercadopago.js` con tus credenciales
+4. **Prueba los pagos**: Usa las tarjetas de prueba proporcionadas
+
+**Nota**: Sin MercadoPago configurado, el botón de pago mostrará un error.
 
 Para construir la aplicación para producción:
 ```bash

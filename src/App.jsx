@@ -14,10 +14,6 @@ import GameFilters from "./components/GameFilters"
 import Offers from "./components/Offers"
 import MustHave from "./components/MustHave"
 
-import Perfil from "./pages/Perfil"
-import Admin from "./pages/Admin"
-import SobreProyecto from "./pages/SobreProyecto"
-import Contacto from "./pages/Contacto"
 import ProtectedRoute from "./components/ProtectedRoute"
 import SEO from "./components/SEO"
 import { useGames } from "./hooks/useGames"
@@ -28,9 +24,19 @@ import { ProductProvider } from "./context/ProductContext"
 import SkipLink from "./components/SkipLink"
 import { usePagination } from "./hooks/usePagination"
 import { FavoritesProvider } from "./context/FavoritesContext"
+import { isExternalImage, getProxiedImageUrl } from "./utils/imageProxy"
+import { 
+  LazyAdmin, 
+  LazyPerfil, 
+  LazySobreProyecto, 
+  LazyContacto, 
+  LazyPaymentSuccess, 
+  LazyPaymentFailure,
+  LazyWebVitalsMonitor 
+} from "./components/LazyComponents"
 
 function App() {
-  const { games, loading, error, usingMockData, refetchGames, forceMockData } = useGames();
+  const { games, loading, error, usingMockData, isInitialLoad, refetchGames, forceMockData } = useGames();
   const {
     filteredGames,
     searchTerm,
@@ -145,6 +151,40 @@ function App() {
     if (isCartOpen) setCartShouldRender(true);
   }, [isCartOpen]);
 
+  // Precarga dinámica para optimización de LCP
+  useEffect(() => {
+    if (games && games.length > 0) {
+      const firstGame = games[0];
+      if (firstGame && firstGame.thumbnail) {
+        // Usar proxy para imágenes externas para prevenir cookies de terceros
+        const imageUrl = isExternalImage(firstGame.thumbnail) 
+          ? getProxiedImageUrl(firstGame.thumbnail)
+          : firstGame.thumbnail;
+        
+        // Crear un enlace de precarga para la primera imagen del producto
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'image';
+        link.href = imageUrl;
+        link.fetchpriority = 'high';
+        
+        // Agregar crossorigin para imágenes externas
+        if (isExternalImage(firstGame.thumbnail)) {
+          link.crossOrigin = 'anonymous';
+        }
+        
+        document.head.appendChild(link);
+        
+        // Limpiar el enlace después de un retraso
+        setTimeout(() => {
+          if (document.head.contains(link)) {
+            document.head.removeChild(link);
+          }
+        }, 5000);
+      }
+    }
+  }, [games]);
+
   const handleCartExited = () => setCartShouldRender(false);
 
   const toggleLogin = () => {
@@ -206,7 +246,7 @@ function App() {
         <FavoritesProvider>
           <SEO />
           <SkipLink />
-          <div className="d-flex flex-column min-vh-100">
+          <div className="d-flex flex-column min-vh-100" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <ToastContainer
               position="top-right"
               autoClose={3000}
@@ -238,7 +278,7 @@ function App() {
               <Routes>
                 <Route path="/" element={
                   <>
-                    {showFilters && (
+                    {!(usingMockData && isInitialLoad) && showFilters && (
                       <GameFilters
                         searchTerm={searchTerm}
                         setSearchTerm={setSearchTerm}
@@ -261,7 +301,7 @@ function App() {
                       />
                     )}
                     <ProductList 
-                      products={filteredGames} 
+                      products={filteredGames.slice(0, 4)}
                       addToCart={addToCart} 
                       removeFromCart={removeFromCart}
                       cartItems={cartItems}
@@ -269,6 +309,7 @@ function App() {
                       loading={loading}
                       error={error}
                       usingMockData={usingMockData}
+                      isInitialLoad={isInitialLoad}
                       onRefetch={refetchGames}
                       onForceMock={forceMockData}
                     />
@@ -372,13 +413,15 @@ function App() {
                   path="/perfil" 
                   element={
                     <ProtectedRoute>
-                      <Perfil />
+                      <LazyPerfil />
                     </ProtectedRoute>
                   } 
                 />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/sobre-proyecto" element={<SobreProyecto />} />
-                <Route path="/contacto" element={<Contacto />} />
+                <Route path="/admin" element={<LazyAdmin />} />
+                <Route path="/sobre-proyecto" element={<LazySobreProyecto />} />
+                <Route path="/contacto" element={<LazyContacto />} />
+                <Route path="/payment/success" element={<LazyPaymentSuccess />} />
+                <Route path="/payment/failure" element={<LazyPaymentFailure />} />
               </Routes>
 
               {isLoginOpen && (
@@ -400,6 +443,7 @@ function App() {
             </main>
 
             <Footer />
+            <LazyWebVitalsMonitor />
           </div>
         </FavoritesProvider>
       </ProductProvider>

@@ -309,6 +309,7 @@ const Admin = () => {
                                       alt={product.title}
                                       style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                                       className="rounded"
+                                      crossorigin="anonymous"
                                     />
                                   </td>
                                   <td>

@@ -59,7 +59,7 @@ const MustHave = ({
       />
       
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-        {games.map((game) => (
+        {games.map((game, index) => (
           <div key={game.id} className="col">
             <ProductCard
               product={game}
@@ -67,6 +67,7 @@ const MustHave = ({
               removeFromCart={removeFromCart}
               updateQuantity={updateQuantity}
               cartItems={cartItems}
+              isLCP={index === 0}
             />
           </div>
         ))}

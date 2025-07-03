@@ -10,7 +10,7 @@ const Footer = () => {
   const handleShow = () => setShowModal(true);
 
   return (
-    <footer className="bg-dark text-white py-5 mt-5">
+    <footer className="bg-dark text-white py-5 mt-5" style={{ marginTop: 'auto' }}>
       <div className="container">
         <div className="row gy-4">
           <div className="col-md-4">
@@ -18,7 +18,7 @@ const Footer = () => {
               <FaGamepad className="me-2" />
               Mi nuevo vicio
             </h3>
-            <p className="text-secondary">
+            <p className="text-secondary-accessible">
               <strong>Proyecto Educativo:</strong> Plataforma de demostración para mostrar habilidades de desarrollo web. 
               Todos los juegos mostrados son gratuitos y provienen de la API pública de FreeToGame.
             </p>
@@ -32,17 +32,17 @@ const Footer = () => {
             <h3 className="fs-4 fw-bold mb-3">Enlaces</h3>
             <ul className="list-unstyled">
               <li className="mb-2">
-                <Link to="/" className="text-secondary text-decoration-none hover-text-white">
+                <Link to="/" className="text-secondary-accessible text-decoration-none hover-text-white">
                   Inicio
                 </Link>
               </li>
               <li className="mb-2">
-                <Link to="/sobre-proyecto" className="text-secondary text-decoration-none hover-text-white">
+                <Link to="/sobre-proyecto" className="text-secondary-accessible text-decoration-none hover-text-white">
                   Sobre el Proyecto
                 </Link>
               </li>
               <li className="mb-2">
-                <Link to="/contacto" className="text-secondary text-decoration-none hover-text-white">
+                <Link to="/contacto" className="text-secondary-accessible text-decoration-none hover-text-white">
                   Contacto
                 </Link>
               </li>
@@ -51,7 +51,7 @@ const Footer = () => {
 
           <div className="col-md-4">
             <h3 className="fs-4 fw-bold mb-3">Información del Proyecto</h3>
-            <div className="text-secondary mb-0">
+            <div className="text-secondary-accessible mb-0">
               <p className="mb-1">
                 <FaGraduationCap className="me-2" />
                 <strong>Propósito:</strong> Educativo
@@ -70,12 +70,12 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-top border-secondary mt-4 pt-4 text-center text-secondary">
+        <div className="border-top border-secondary mt-4 pt-4 text-center text-secondary-accessible">
           <p className="mb-2">&copy; {new Date().getFullYear()} Mi nuevo vicio - Proyecto Educativo. Todos los derechos reservados.</p>
           <Button 
             variant="link" 
             onClick={handleShow} 
-            className="text-secondary text-decoration-none p-0"
+            className="text-secondary-accessible text-decoration-none p-0"
           >
             Aviso Legal y Propósito Educativo
           </Button>

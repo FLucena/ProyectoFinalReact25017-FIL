@@ -1,11 +1,64 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchMockGames } from '../data/mockData';
 
+// Productos mock instantáneos para el primer render
+const INSTANT_MOCK = [
+  {
+    id: 1,
+    title: 'Mock Game 1',
+    thumbnail: '/placeholder-logo.png',
+    genre: 'Acción',
+    platform: 'PC',
+    publisher: 'Demo Publisher',
+    release_date: '2023-01-01',
+    price: 0,
+    discount: 0,
+    rating: 4.5
+  },
+  {
+    id: 2,
+    title: 'Mock Game 2',
+    thumbnail: '/placeholder-logo.png',
+    genre: 'Aventura',
+    platform: 'PC',
+    publisher: 'Demo Publisher',
+    release_date: '2023-01-02',
+    price: 0,
+    discount: 0,
+    rating: 4.6
+  },
+  {
+    id: 3,
+    title: 'Mock Game 3',
+    thumbnail: '/placeholder-logo.png',
+    genre: 'Estrategia',
+    platform: 'PC',
+    publisher: 'Demo Publisher',
+    release_date: '2023-01-03',
+    price: 0,
+    discount: 0,
+    rating: 4.7
+  },
+  {
+    id: 4,
+    title: 'Mock Game 4',
+    thumbnail: '/placeholder-logo.png',
+    genre: 'RPG',
+    platform: 'PC',
+    publisher: 'Demo Publisher',
+    release_date: '2023-01-04',
+    price: 0,
+    discount: 0,
+    rating: 4.8
+  }
+];
+
 export const useGames = () => {
-  const [games, setGames] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [games, setGames] = useState(INSTANT_MOCK);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [usingMockData, setUsingMockData] = useState(false);
+  const [usingMockData, setUsingMockData] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Validación de datos de juegos
   const validateGameData = useCallback((data) => {
@@ -93,14 +146,10 @@ export const useGames = () => {
     throw new Error("Todos los proxies CORS fallaron");
   }, [fetchWithTimeout]);
 
-  // Carga de juegos con estrategia de desarrollo vs producción
-  const loadGames = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    
+  // Carga completa de datos en segundo plano
+  const loadFullData = useCallback(async () => {
     // Temporalmente forzar modo producción para probar API real
-    const isDevelopment = false; // Cambiado de import.meta.env.DEV a false
-    
+    const isDevelopment = false;
     if (isDevelopment) {
       try {
         const mockResponse = await fetchMockGames(800);
@@ -108,20 +157,15 @@ export const useGames = () => {
         setUsingMockData(true);
         setError("🛠️ Modo desarrollo: usando datos de demostración");
       } catch (mockErr) {
-        console.error("Error al cargar datos mock:", mockErr);
         setError("❌ Error al cargar datos de demostración");
-        setGames([]);
-      } finally {
-        setLoading(false);
       }
       return;
     }
-    
-    // En producción, intentar API real primero
     try {
       const data = await attemptFetchFromProxies();
       setGames(data);
       setUsingMockData(false);
+      setError(null);
     } catch (err) {
       console.warn("API no disponible, usando datos mock:", err.message);
       
@@ -134,38 +178,25 @@ export const useGames = () => {
       } catch (mockErr) {
         console.error("Error al cargar datos mock:", mockErr);
         setError("❌ Error al cargar datos de demostración");
-        setGames([]);
       }
-    } finally {
-      setLoading(false);
     }
   }, [attemptFetchFromProxies]);
 
   useEffect(() => {
-    loadGames();
-  }, [loadGames]);
+    // Cargar datos reales en segundo plano después de montar
+    setTimeout(() => {
+      loadFullData();
+    }, 100);
+  }, [loadFullData]);
 
   // Función para recargar datos manualmente
   const refetchGames = useCallback(() => {
-    loadGames();
-  }, [loadGames]);
+    loadFullData();
+  }, [loadFullData]);
 
   // Función para forzar uso de datos mock (útil para testing)
-  const forceMockData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const mockResponse = await fetchMockGames(500);
-      setGames(mockResponse.data);
-      setUsingMockData(true);
-      setError("🛠️ Forzado: usando datos de demostración");
-    } catch (mockErr) {
-      setError("❌ Error al cargar datos mock");
-      setGames([]);
-    } finally {
-      setLoading(false);
-    }
+  const forceMockData = useCallback(() => {
+    setGames(INSTANT_MOCK);
   }, []);
 
   return { 
@@ -173,6 +204,7 @@ export const useGames = () => {
     loading, 
     error, 
     usingMockData, 
+    isInitialLoad,
     refetchGames,
     forceMockData
   };

@@ -79,6 +79,8 @@ export const GlobalStyles = createGlobalStyle`
     line-height: 1.5;
     color: ${theme.colors.dark};
     background-color: ${theme.colors.white};
+    font-display: swap;
+    font-synthesis: none;
   }
 
   .App {

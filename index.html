@@ -4,8 +4,119 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.freetogame.com https://api.allorigins.win https://thingproxy.freeboard.io https://corsproxy.io https://api.codetabs.com https://images.weserv.nl;">
     <title>Mi Nuevo Vicio - Proyecto Educativo de Ecommerce</title>
     <meta name="description" content="Proyecto educativo de ecommerce desarrollado con React. Muestra juegos gratuitos de la API FreeToGame para fines de aprendizaje." />
+    
+    <!-- Precargar recursos críticos para optimización de LCP -->
+    <link rel="preload" href="/placeholder-logo.png" as="image" type="image/png" fetchpriority="high" />
+    
+    <!-- Preconectar a dominios externos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    
+    <!-- Precargar fuentes críticas -->
+    <!-- <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" /> -->
+    <!-- <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" /></noscript> -->
+    
+    <!-- DNS prefetch y preconexión para llamadas API -->
+    <link rel="dns-prefetch" href="https://www.freetogame.com" />
+    <link rel="dns-prefetch" href="https://api.allorigins.win" />
+    <link rel="dns-prefetch" href="https://thingproxy.freeboard.io" />
+    <link rel="dns-prefetch" href="https://corsproxy.io" />
+    <link rel="dns-prefetch" href="https://api.codetabs.com" />
+    <link rel="dns-prefetch" href="https://images.weserv.nl" />
+    
+    <!-- Preconectar a dominios externos críticos -->
+    <link rel="preconnect" href="https://api.allorigins.win" />
+    <link rel="preconnect" href="https://images.weserv.nl" />
+    
+    <!-- CSS crítico para prevenir cambios de diseño -->
+    <style>
+      /* CSS CRÍTICO - Solo estilos esenciales para LCP y accesibilidad */
+      
+      /* Reset básico y estilos de body */
+      * { box-sizing: border-box; }
+      
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-display: swap;
+        line-height: 1.5;
+        background-color: #ffffff;
+        color: #212529;
+      }
+      
+      /* Navbar crítico - visible inmediatamente */
+      .navbar {
+        background-color: #212529 !important;
+        min-height: 56px;
+        position: fixed;
+        top: 35px;
+        width: 100%;
+        z-index: 1030;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      
+      /* Tarjetas críticas - prevenir layout shifts */
+      .card {
+        aspect-ratio: auto;
+        contain-intrinsic-size: 0 400px;
+        content-visibility: auto;
+        border-radius: 0.5rem;
+        border: 1px solid rgba(0,0,0,0.125);
+        background-color: #ffffff;
+        will-change: transform;
+        transform: translateZ(0);
+      }
+      
+      /* Imágenes LCP - optimización crítica */
+      .lcp-image {
+        aspect-ratio: 16/9;
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        display: block;
+        background-color: #f8f9fa;
+      }
+      
+      /* Skeleton loading - estados críticos */
+      .loading-skeleton, .skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+        border-radius: 4px;
+      }
+      
+      @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      
+      /* Botones críticos - accesibilidad inmediata */
+      .btn {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+        will-change: transform;
+      }
+      
+      /* Colores de accesibilidad críticos */
+      .text-primary-accessible { color: #b02a37 !important; }
+      .text-secondary-accessible { color: #495057 !important; }
+      .text-warning-accessible { color: #8B4513 !important; }
+      
+      /* Foco crítico para navegación por teclado */
+      :focus {
+        outline: 2px solid #b02a37 !important;
+        outline-offset: 2px !important;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

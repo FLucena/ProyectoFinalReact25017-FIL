@@ -184,13 +184,13 @@ const GameFilters = ({
         <div className="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded border">
           <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2">
             <p className="mb-0 text-muted small">
-              Mostrando <span className="fw-bold text-primary">{currentPageGames || 0}</span> de <span className="fw-bold text-primary">{totalGames || 0}</span> juegos
+              Mostrando <span className="fw-bold text-primary-accessible">{currentPageGames || 0}</span> de <span className="fw-bold text-primary-accessible">{totalGames || 0}</span> juegos
             </p>
             {totalPages > 1 && (
               <p className="mb-0 text-muted small">
-                Página <span className="fw-bold text-primary">{currentPage || 1}</span> de <span className="fw-bold text-primary">{totalPages || 1}</span>
+                Página <span className="fw-bold text-primary-accessible">{currentPage || 1}</span> de <span className="fw-bold text-primary-accessible">{totalPages || 1}</span>
                 {totalPages > 10 && (
-                  <span className="ms-2 text-warning">
+                  <span className="ms-2 text-warning-accessible">
                     ⚠️ Muchas páginas ({totalPages})
                   </span>
                 )}

@@ -6,12 +6,14 @@ import { useState } from "react"
 import { Modal, Button, Offcanvas } from "react-bootstrap"
 import { useAuth } from "../context/AuthContext"
 import ImageWithFallback from "./ui/ImageWithFallback"
+import Checkout from "./Checkout"
 
 const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOpen = true, toggleLogin, onExited }) => {
   // Estados para manejo de modales de confirmación
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [showClearModal, setShowClearModal] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
   const { isAuthenticated } = useAuth();
 
   // Calcula el total y cantidad de items para mostrar en el header
@@ -141,6 +143,9 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
                         <ImageWithFallback
                           src={item.image || item.thumbnail}
                           alt={`Imagen de ${item.title}`}
+                          width="80"
+                          height="80"
+                          aspectRatio="1/1"
                           style={{ width: "80px", height: "80px" }}
                         />
                       </div>
@@ -220,10 +225,11 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
               <Button 
                 variant="danger" 
                 className="w-100 py-2 d-flex align-items-center justify-content-center gap-2"
-                aria-label="Proceder al pago"
+                onClick={() => setShowCheckout(true)}
+                aria-label="Proceder al pago con MercadoPago"
               >
                 <FaCreditCard size={16} />
-                Proceder al Pago
+                Pagar con MercadoPago
               </Button>
             </div>
           )}
@@ -291,6 +297,22 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Componente de Checkout con MercadoPago */}
+      <Checkout
+        show={showCheckout}
+        onHide={() => setShowCheckout(false)}
+        cartItems={cart}
+        total={total}
+        onPaymentSuccess={() => {
+          clearCart();
+          setShowCheckout(false);
+          closeCart();
+        }}
+        onPaymentFailure={() => {
+          setShowCheckout(false);
+        }}
+      />
     </>
   );
 };

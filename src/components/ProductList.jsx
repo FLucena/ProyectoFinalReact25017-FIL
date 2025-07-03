@@ -2,8 +2,10 @@
 
 import { Row, Col, Modal, Button } from "react-bootstrap"
 import ProductCard from "./ProductCard"
+import ProductCardSkeleton from "./ui/ProductCardSkeleton"
 import MockDataNotification from "./MockDataNotification"
 import { useState } from "react"
+import { useListLayoutShift } from "../hooks/useLayoutShift"
 
 const ProductList = ({ 
   products, 
@@ -14,24 +16,39 @@ const ProductList = ({
   loading, 
   error,
   usingMockData,
+  isInitialLoad = false,
   onRefetch,
   onForceMock
 }) => {
   const [showModal, setShowModal] = useState(false);
 
+  // Validación adicional para asegurar que products sea un array
+  const safeProducts = Array.isArray(products) ? products : [];
+  
+  const { containerRef, containerStyle } = useListLayoutShift(
+    safeProducts.length || 8, 
+    '400px'
+  );
+
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
 
-  // Validación adicional para asegurar que products sea un array
-  const safeProducts = Array.isArray(products) ? products : [];
-
-  if (loading) {
+  if (loading && !isInitialLoad) {
     return (
-      <div className="text-center py-5">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Cargando...</span>
-        </div>
-        <p className="mt-3 text-muted">Cargando juegos...</p>
+      <div className="mx-4 mx-md-5">
+        <MockDataNotification 
+          usingMockData={usingMockData}
+          error={error}
+          onRefetch={onRefetch}
+          onForceMock={onForceMock}
+        />
+        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <Col key={`skeleton-${index}`}>
+              <ProductCardSkeleton />
+            </Col>
+          ))}
+        </Row>
       </div>
     )
   }
@@ -53,7 +70,15 @@ const ProductList = ({
   }
 
   return (
-    <div className="mx-4 mx-md-5">
+    <div 
+      className="mx-4 mx-md-5"
+      ref={containerRef}
+      style={{
+        ...containerStyle,
+        minHeight: '450px', // 1 fila de 4 cards
+        position: 'relative'
+      }}
+    >
       <MockDataNotification 
         usingMockData={usingMockData}
         error={error}
@@ -62,7 +87,7 @@ const ProductList = ({
       />
       
       <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-        {safeProducts.map((product) => (
+        {safeProducts.map((product, index) => (
           <Col key={product.id}>
             <ProductCard 
               product={product} 
@@ -70,16 +95,15 @@ const ProductList = ({
               removeFromCart={removeFromCart}
               cartItems={cartItems}
               updateQuantity={updateQuantity}
+              isLCP={index === 0} // Mark first product as LCP image
             />
           </Col>
         ))}
       </Row>
       
-      <div className="text-center mt-4">
-        <Button variant="link" onClick={handleShow} className="text-muted">
-          Aviso Legal
-        </Button>
-      </div>
+      <Button variant="link" onClick={handleShow} className="text-muted text-center mt-4 d-block">
+        Aviso Legal
+      </Button>
 
       <Modal show={showModal} onHide={handleClose} centered>
         <Modal.Header closeButton>

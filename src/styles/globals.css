@@ -13,6 +13,18 @@
   --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+  
+  /* Accessibility-focused colors with better contrast */
+  --bs-primary-dark: #b02a37;
+  --bs-secondary-dark: #495057;
+  --bs-warning-dark: #e0a800;
+  --bs-light-text: #495057;
+  --bs-dark-text: #ffffff;
+  
+  /* Additional accessibility colors for better contrast */
+  --bs-warning-darker: #8B4513;  /* Darker warning for better contrast */
+  --bs-secondary-darker: #343a40; /* Darker secondary for dark backgrounds */
+  --bs-footer-text: #dee2e6;     /* Light gray for footer text */
 }
 
 body {
@@ -26,6 +38,7 @@ body {
   -webkit-tap-highlight-color: transparent;
   margin: 0;
   padding: 0;
+  font-display: swap;
 }
 
 .form-control::placeholder {
@@ -63,7 +76,11 @@ body {
 /* Estilos de tarjetas */
 .card {
   border-radius: 0.5rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 400px;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .card:hover {
@@ -77,6 +94,9 @@ body {
   padding: 0.75rem;
   min-height: 44px;
   border-radius: 0.5rem;
+  contain: layout style paint;
+  will-change: border-color, box-shadow;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* Estilos de foco */
@@ -109,4 +129,237 @@ body {
 .skip-link:focus {
   left: 0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Accessibility-focused text colors for better contrast */
+.text-primary-accessible {
+  color: var(--bs-primary-dark) !important;
+}
+
+.text-secondary-accessible {
+  color: var(--bs-secondary-dark) !important;
+}
+
+.text-warning-accessible {
+  color: var(--bs-warning-darker) !important;
+}
+
+/* Dark background text colors */
+.bg-dark .text-secondary {
+  color: var(--bs-footer-text) !important;
+}
+
+.bg-dark .text-secondary:hover {
+  color: #ffffff !important;
+}
+
+/* Light background text colors */
+.bg-light .text-primary {
+  color: var(--bs-primary-dark) !important;
+}
+
+.bg-light .text-warning {
+  color: var(--bs-warning-darker) !important;
+}
+
+/* Footer specific styles */
+footer.bg-dark .text-secondary {
+  color: var(--bs-footer-text) !important;
+}
+
+footer.bg-dark .text-secondary:hover {
+  color: #ffffff !important;
+}
+
+footer.bg-dark strong {
+  color: #ffffff !important;
+}
+
+footer.bg-dark a.text-secondary {
+  color: var(--bs-footer-text) !important;
+}
+
+footer.bg-dark a.text-secondary:hover {
+  color: #ffffff !important;
+}
+
+/* Button link styles in footer */
+footer.bg-dark .btn-link.text-secondary {
+  color: var(--bs-footer-text) !important;
+}
+
+footer.bg-dark .btn-link.text-secondary:hover {
+  color: #ffffff !important;
+}
+
+/* Pagination info styles */
+.bg-light .fw-bold.text-primary {
+  color: var(--bs-primary-dark) !important;
+}
+
+.bg-light .text-warning {
+  color: var(--bs-warning-darker) !important;
+}
+
+/* Footer accessibility overrides */
+footer.bg-dark .text-secondary-accessible {
+  color: var(--bs-footer-text) !important;
+}
+
+footer.bg-dark a.text-secondary-accessible {
+  color: var(--bs-footer-text) !important;
+}
+
+footer.bg-dark a.text-secondary-accessible:hover {
+  color: #ffffff !important;
+}
+
+footer.bg-dark .btn-link.text-secondary-accessible {
+  color: var(--bs-footer-text) !important;
+}
+
+footer.bg-dark .btn-link.text-secondary-accessible:hover {
+  color: #ffffff !important;
+}
+
+/* Light background warning text */
+.bg-light .text-warning-accessible {
+  color: var(--bs-warning-darker) !important;
+}
+
+/* Hover effects for better accessibility */
+.hover-text-white:hover {
+  color: #ffffff !important;
+}
+
+/* Ensure all links have proper contrast */
+a {
+  color: var(--bs-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--bs-primary-dark);
+  text-decoration: underline;
+}
+
+/* Dark background links */
+.bg-dark a {
+  color: var(--bs-footer-text);
+}
+
+.bg-dark a:hover {
+  color: #ffffff;
+}
+
+/* Ensure proper contrast for all text elements */
+.text-muted {
+  color: #6c757d !important;
+}
+
+.bg-light .text-muted {
+  color: #495057 !important;
+}
+
+/* Badge contrast improvements */
+.badge.bg-warning {
+  color: #000000 !important;
+}
+
+.badge.bg-success {
+  color: #ffffff !important;
+}
+
+.badge.bg-primary {
+  color: #ffffff !important;
+}
+
+.badge.bg-danger {
+  color: #ffffff !important;
+}
+
+/* Alert contrast improvements */
+.alert-info {
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+  color: #0c5460;
+}
+
+.alert-warning {
+  background-color: #fff3cd;
+  border-color: #ffeaa7;
+  color: #856404;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+/* Additional hover improvements */
+footer.bg-dark a:hover,
+footer.bg-dark .btn-link:hover {
+  color: #ffffff !important;
+  text-decoration: underline;
+}
+
+/* Ensure all footer text elements have proper contrast */
+footer.bg-dark p,
+footer.bg-dark div {
+  color: var(--bs-footer-text);
+}
+
+footer.bg-dark strong {
+  color: #ffffff;
+}
+
+/* Specific footer element targeting for better contrast */
+footer.bg-dark .text-secondary-accessible,
+footer.bg-dark p.text-secondary-accessible,
+footer.bg-dark div.text-secondary-accessible {
+  color: var(--bs-footer-text) !important;
+}
+
+footer.bg-dark a.text-secondary-accessible,
+footer.bg-dark button.text-secondary-accessible {
+  color: var(--bs-footer-text) !important;
+}
+
+footer.bg-dark a.text-secondary-accessible:hover,
+footer.bg-dark button.text-secondary-accessible:hover {
+  color: #ffffff !important;
+}
+
+/* Target specific footer paragraph elements */
+footer.bg-dark p.mb-1,
+footer.bg-dark p.mb-2 {
+  color: var(--bs-footer-text) !important;
+}
+
+/* Target footer button links specifically */
+footer.bg-dark .btn-link.text-secondary-accessible {
+  color: var(--bs-footer-text) !important;
+  background: none;
+  border: none;
+  padding: 0;
+  text-decoration: none;
+}
+
+footer.bg-dark .btn-link.text-secondary-accessible:hover {
+  color: #ffffff !important;
+  text-decoration: underline;
+}
+
+/* Ensure warning text on light backgrounds has sufficient contrast */
+.bg-light .text-warning-accessible,
+div.bg-light .text-warning-accessible {
+  color: var(--bs-warning-darker) !important;
+  font-weight: 500;
 } 

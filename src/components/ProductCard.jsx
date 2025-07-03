@@ -9,7 +9,7 @@ import ImageWithFallback from "./ui/ImageWithFallback"
 import styled from 'styled-components'
 import { useFavorites } from '../context/FavoritesContext'
 
-// Styled-components
+// Styled-components optimizados
 const StyledCard = styled(Card)`
   height: 100%;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -21,14 +21,15 @@ const StyledCard = styled(Card)`
   }
 `
 
-const ImageWrapper = styled.div`
+const ImageContainer = styled.div`
   position: relative;
+  aspect-ratio: 16/9;
 `
 
 const StyledImage = styled(ImageWithFallback)`
-  height: 200px;
-  object-fit: cover;
   width: 100%;
+  height: 100%;
+  object-fit: cover;
 `
 
 const StyledBadge = styled(Badge)`
@@ -43,6 +44,7 @@ const StyledTitle = styled(Card.Title)`
   -webkit-box-orient: vertical;
   line-height: 1.3;
   min-height: 2.6em;
+  margin-bottom: 0.5rem;
 `
 
 const ActionOverlay = styled.div`
@@ -59,7 +61,7 @@ const ActionOverlay = styled.div`
   opacity: 0;
   transition: opacity 0.3s ease;
   
-  ${ImageWrapper}:hover & {
+  ${ImageContainer}:hover & {
     opacity: 1;
   }
 `
@@ -82,11 +84,10 @@ const ActionButton = styled.button`
   }
 `
 
-const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuantity }) => {
+const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuantity, isLCP = false }) => {
   const { title, thumbnail, genre, platform, publisher, release_date, discount, rating } = product
   const [quantity, setQuantity] = useState(0)
   const [isAdded, setIsAdded] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
   const { isFavorite, toggleFavorite } = useFavorites();
 
   useEffect(() => {
@@ -213,12 +214,17 @@ const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuan
 
   return (
     <StyledCard role="article" aria-labelledby={`product-title-${product.id}`}>
-      <ImageWrapper>
+      <ImageContainer>
         <StyledImage
           src={thumbnail}
           alt={`Imagen de ${title}`}
-          loading="lazy"
+          loading={isLCP ? "eager" : "lazy"}
+          fetchpriority={isLCP ? "high" : "auto"}
+          className={isLCP ? "lcp-image" : ""}
           onClick={handleImageDoubleClick}
+          width="300"
+          height="169"
+          aspectRatio="16/9"
         />
         {discount && discount > 0 && (
           <StyledBadge 
@@ -265,62 +271,43 @@ const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuan
             <FaShare color="#6c757d" size={16} aria-hidden="true" />
           </ActionButton>
         </ActionOverlay>
-      </ImageWrapper>
+      </ImageContainer>
       <Card.Body className="d-flex flex-column">
         <StyledTitle 
           id={`product-title-${product.id}`}
-          className="fs-6 fw-bold mb-2"
+          className="fs-6 fw-bold"
         >
           {title}
         </StyledTitle>
         
-        <div className="mb-2" role="group" aria-label="Información del juego">
-          <Badge bg="success" className="me-2" aria-label={`Género: ${genre}`}>
-            {genre}
-          </Badge>
-        </div>
+        <Badge bg="success" className="me-2 mb-2" aria-label={`Género: ${genre}`}>
+          {genre}
+        </Badge>
         
         <Card.Text className="small text-muted mb-2">
-          <span aria-label={`Editor: ${publisher || 'No disponible'}`}>
-            Editor: {publisher || 'No disponible'}
-          </span>
+          Editor: {publisher || 'No disponible'}
         </Card.Text>
         
         <Card.Text className="small text-muted mb-3">
-          <span aria-label={`Fecha de lanzamiento: ${formatDate(release_date)}`}>
-            Fecha: {formatDate(release_date)}
-          </span>
+          Fecha: {formatDate(release_date)}
         </Card.Text>
         
         <div className="mt-auto">
-          <div className="d-flex justify-content-between align-items-center mb-2">
-            <div role="group" aria-label="Precio del producto">
-              {product.discount && product.discount > 0 ? (
-                <div>
-                  <span 
-                    className="text-decoration-line-through text-muted small"
-                    aria-label={`Precio original: ${formatPrice(product.price)}`}
-                  >
-                    {formatPrice(product.price)}
-                  </span>
-                  <br />
-                  <span 
-                    className="text-danger fw-bold fs-6"
-                    aria-label={`Precio con descuento: ${formatPrice(getDiscountPrice())}`}
-                  >
-                    {formatPrice(getDiscountPrice())}
-                  </span>
-                </div>
-              ) : (
-                <span 
-                  className="text-danger fw-bold fs-6"
-                  aria-label={`Precio: ${formatPrice(product.price)}`}
-                >
-                  {formatPrice(product.price)}
-                </span>
-              )}
+          {product.discount && product.discount > 0 ? (
+            <div className="mb-2">
+              <span className="text-decoration-line-through text-muted small">
+                {formatPrice(product.price)}
+              </span>
+              <br />
+              <span className="text-danger fw-bold fs-6">
+                {formatPrice(getDiscountPrice())}
+              </span>
             </div>
-          </div>
+          ) : (
+            <span className="text-danger fw-bold fs-6 mb-2 d-block">
+              {formatPrice(product.price)}
+            </span>
+          )}
           
           <div className="d-flex gap-2">
             <Link 

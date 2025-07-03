@@ -165,6 +165,10 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
               src={thumbnail}
               alt={title}
               className="img-fluid rounded shadow"
+              width="800"
+              height="450"
+              fetchpriority="high"
+              crossorigin="anonymous"
               style={{ width: "100%", height: "350px", objectFit: "cover" }}
               onError={(e) => {
                 e.target.onerror = null;
@@ -189,6 +193,10 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
                       src={screenshot.image} 
                       alt={`Screenshot ${index+1}`}
                       className="img-fluid rounded"
+                      width="120"
+                      height="80"
+                      loading="lazy"
+                      crossorigin="anonymous"
                       style={{height: "80px", width: "100%", objectFit: "cover"}}
                       onError={(e) => {
                         e.target.onerror = null;
@@ -208,7 +216,7 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
             
             <div className="mb-3">
               <Badge bg="success" className="me-2 py-2 px-3 fs-6">{genre}</Badge>
-              <span className="d-inline-flex align-items-center ms-2 text-warning">
+              <span className="d-inline-flex align-items-center ms-2 text-warning-accessible">
                 <Star size={18} fill="currentColor" />
                 <span className="ms-1 fw-semibold">{rating}</span>
               </span>

@@ -26,35 +26,30 @@ const MockDataNotification = ({
 
   return (
     <Alert variant={getVariant()} className={className}>
-      <div className="d-flex align-items-center justify-content-between">
-        <div className="d-flex align-items-center">
-          <span className="me-2">{getIcon()}</span>
-          <span>{error || "Usando datos de demostración"}</span>
-        </div>
-        <div className="d-flex gap-2">
-          {onRefetch && (
-            <Button 
-              variant="outline-primary" 
-              size="sm"
-              onClick={onRefetch}
-              aria-label="Reintentar carga de datos"
-            >
-              <FaSync className="me-1" />
-              Reintentar
-            </Button>
-          )}
-          {onForceMock && (
-            <Button 
-              variant="outline-secondary" 
-              size="sm"
-              onClick={onForceMock}
-              aria-label="Forzar datos de demostración"
-            >
-              Usar Demo
-            </Button>
-          )}
-        </div>
-      </div>
+      <span className="me-2">{getIcon()}</span>
+      <span>{error || "Usando datos de demostración"}</span>
+      {onRefetch && (
+        <Button 
+          variant="outline-primary" 
+          size="sm"
+          onClick={onRefetch}
+          aria-label="Reintentar carga de datos"
+          className="ms-auto me-2"
+        >
+          <FaSync className="me-1" />
+          Reintentar
+        </Button>
+      )}
+      {onForceMock && (
+        <Button 
+          variant="outline-secondary" 
+          size="sm"
+          onClick={onForceMock}
+          aria-label="Forzar datos de demostración"
+        >
+          Usar Demo
+        </Button>
+      )}
     </Alert>
   );
 };
