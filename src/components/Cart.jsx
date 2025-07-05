@@ -1,12 +1,12 @@
 "use client"
 
-import { Minus, Plus, Trash2, Lock, ShoppingCart } from "lucide-react"
-import { FaMinus, FaPlus, FaTrash, FaLock, FaShoppingCart, FaCreditCard, FaTimes } from "react-icons/fa"
+import { FaMinus, FaPlus, FaTrash, FaLock, FaShoppingCart, FaCreditCard } from "react-icons/fa"
 import { useState } from "react"
 import { Modal, Button, Offcanvas } from "react-bootstrap"
 import { useAuth } from "../context/AuthContext"
 import ImageWithFallback from "./ui/ImageWithFallback"
 import Checkout from "./Checkout"
+import React from "react"
 
 const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOpen = true, toggleLogin, onExited }) => {
   // Estados para manejo de modales de confirmación
@@ -317,4 +317,4 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
   );
 };
 
-export default Cart;
+export default React.memo(Cart)

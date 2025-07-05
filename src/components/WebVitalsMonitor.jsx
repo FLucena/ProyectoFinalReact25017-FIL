@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { logAccessibilityResults } from '../utils/contrastChecker';
 
 const WebVitalsMonitor = () => {
   useEffect(() => {
@@ -57,10 +56,9 @@ const WebVitalsMonitor = () => {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
 
-    // Log accessibility test results in development
+    // Log development info
     if (import.meta.env.DEV) {
-      console.log('🔍 Running accessibility tests...');
-      logAccessibilityResults();
+      console.log('🔍 Web Vitals Monitor active in development mode');
     }
 
     return () => {

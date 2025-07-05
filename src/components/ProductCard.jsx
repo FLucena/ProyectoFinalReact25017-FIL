@@ -8,6 +8,7 @@ import { Link } from "react-router-dom"
 import ImageWithFallback from "./ui/ImageWithFallback"
 import styled from 'styled-components'
 import { useFavorites } from '../context/FavoritesContext'
+import React from "react"
 
 // Styled-components optimizados
 const StyledCard = styled(Card)`
@@ -218,13 +219,11 @@ const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuan
         <StyledImage
           src={thumbnail}
           alt={`Imagen de ${title}`}
-          loading={isLCP ? "eager" : "lazy"}
-          fetchpriority={isLCP ? "high" : "auto"}
-          className={isLCP ? "lcp-image" : ""}
           onClick={handleImageDoubleClick}
           width="300"
           height="169"
           aspectRatio="16/9"
+          isLCP={isLCP}
         />
         {discount && discount > 0 && (
           <StyledBadge 
@@ -360,4 +359,4 @@ const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuan
   )
 }
 
-export default ProductCard
+export default React.memo(ProductCard)

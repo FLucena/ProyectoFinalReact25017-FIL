@@ -174,6 +174,7 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
                 e.target.onerror = null;
                 e.target.src = "/placeholder.svg";
               }}
+              loading="lazy"
             />
             <Badge 
               bg="primary" 

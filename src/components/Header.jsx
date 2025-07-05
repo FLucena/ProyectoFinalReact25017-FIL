@@ -44,7 +44,7 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
       {/* Header principal con navegación */}
       <header 
         className="fixed-top bg-dark text-white" 
-        style={{ top: '35px', zIndex: 1030 }}
+        style={{ top: '32px', zIndex: 1030 }}
         role="banner"
         aria-label="Navegación principal"
       >

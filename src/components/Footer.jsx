@@ -10,7 +10,7 @@ const Footer = () => {
   const handleShow = () => setShowModal(true);
 
   return (
-    <footer className="bg-dark text-white py-5 mt-5" style={{ marginTop: 'auto' }}>
+    <footer className="bg-dark text-white mt-5 py-5">
       <div className="container">
         <div className="row gy-4">
           <div className="col-md-4">

@@ -10,15 +10,14 @@
     
     <!-- Precargar recursos críticos para optimización de LCP -->
     <link rel="preload" href="/placeholder-logo.png" as="image" type="image/png" fetchpriority="high" />
+    <link rel="preload" href="/placeholder.jpg" as="image" type="image/jpeg" fetchpriority="high" />
     
     <!-- Preconectar a dominios externos -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-    
-    <!-- Precargar fuentes críticas -->
-    <!-- <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" /> -->
-    <!-- <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" /></noscript> -->
-    
+    <link rel="preconnect" href="https://images.weserv.nl" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://www.freetogame.com" />
+        
     <!-- DNS prefetch y preconexión para llamadas API -->
     <link rel="dns-prefetch" href="https://www.freetogame.com" />
     <link rel="dns-prefetch" href="https://api.allorigins.win" />
@@ -79,6 +78,17 @@
         object-fit: cover;
         display: block;
         background-color: #f8f9fa;
+        contain: layout style paint;
+        content-visibility: auto;
+        contain-intrinsic-size: 300px 169px;
+      }
+      
+      /* LCP Optimization: Image container to prevent layout shifts */
+      .image-container {
+        position: relative;
+        aspect-ratio: 16/9;
+        background-color: #f8f9fa;
+        overflow: hidden;
       }
       
       /* Skeleton loading - estados críticos */

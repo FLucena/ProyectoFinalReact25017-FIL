@@ -24,6 +24,8 @@ const ImageWithFallback = ({
   aspectRatio = "16/9",
   fetchpriority = "auto",
   useProxy = true,
+  loading = "lazy",
+  isLCP = false,
   ...props 
 }) => {
   const [imageError, setImageError] = useState(false);
@@ -66,7 +68,7 @@ const ImageWithFallback = ({
 
   return (
     <div 
-      className={`position-relative ${className}`}
+      className={`position-relative ${isLCP ? 'image-container' : ''} ${className}`}
       style={{
         backgroundColor: '#f8f9fa',
         display: 'flex',
@@ -79,7 +81,7 @@ const ImageWithFallback = ({
         ...style
       }}
     >
-      {imageLoading && (
+      {imageLoading && !isLCP && (
         <div className="position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
           <div className="spinner-border spinner-border-sm text-danger" role="status">
             <span className="visually-hidden">Cargando imagen...</span>
@@ -94,15 +96,16 @@ const ImageWithFallback = ({
           alt={alt}
           width={width}
           height={height}
-          fetchpriority={fetchpriority}
+          fetchpriority={isLCP ? "high" : fetchpriority}
           crossOrigin={isExternal ? "anonymous" : undefined}
-          className={`w-100 h-100 ${imageLoading ? 'opacity-0' : 'opacity-100'} ${className}`}
+          className={`w-100 h-100 ${imageLoading && !isLCP ? 'opacity-0' : 'opacity-100'} ${isLCP ? 'lcp-image' : ''} ${className}`}
           style={{ 
             objectFit: 'cover',
-            transition: 'opacity 0.3s ease'
+            transition: isLCP ? 'none' : 'opacity 0.3s ease'
           }}
           onError={handleImageError}
           onLoad={handleImageLoad}
+          loading={isLCP ? "eager" : loading}
           {...props}
         />
       </picture>

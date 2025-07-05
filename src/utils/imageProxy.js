@@ -94,4 +94,90 @@ export const preloadImage = (url) => {
  */
 export const preloadImages = (urls) => {
   return Promise.allSettled(urls.map(url => preloadImage(url)));
+};
+
+/**
+ * Optimize image URL for LCP (Largest Contentful Paint)
+ * @param {string} url - The original image URL
+ * @param {Object} options - Optimization options
+ * @returns {Object} - Optimized image data
+ */
+export const optimizeForLCP = (url, options = {}) => {
+  const {
+    width = 300,
+    height = 169,
+    quality = 85,
+    format = 'webp'
+  } = options;
+
+  if (!url) {
+    return {
+      url: '/placeholder-logo.png',
+      attributes: {
+        fetchpriority: 'high',
+        loading: 'eager',
+        crossorigin: undefined
+      }
+    };
+  }
+
+  // Use proxy for external images
+  const finalUrl = isExternalImage(url) 
+    ? getProxiedImageUrl(url)
+    : url;
+
+  return {
+    url: finalUrl,
+    attributes: {
+      fetchpriority: 'high',
+      loading: 'eager',
+      crossorigin: isExternalImage(url) ? 'anonymous' : undefined,
+      width,
+      height,
+      aspectRatio: `${width}/${height}`
+    }
+  };
+};
+
+/**
+ * Create preload link for LCP image
+ * @param {string} url - The image URL to preload
+ * @param {Object} options - Preload options
+ */
+export const createLCPPreload = (url, options = {}) => {
+  const { priority = 'high', cleanup = true, timeout = 10000 } = options;
+  
+  if (!url) return null;
+
+  // Remove existing LCP preload links
+  const existingLinks = document.querySelectorAll('link[rel="preload"][data-lcp="true"]');
+  existingLinks.forEach(link => link.remove());
+
+  const finalUrl = isExternalImage(url) 
+    ? getProxiedImageUrl(url)
+    : url;
+
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'image';
+  link.href = finalUrl;
+  link.fetchpriority = priority;
+  link.setAttribute('data-lcp', 'true');
+
+  if (isExternalImage(url)) {
+    link.crossOrigin = 'anonymous';
+  }
+
+  // Insert at the beginning for highest priority
+  document.head.insertBefore(link, document.head.firstChild);
+
+  if (cleanup) {
+    setTimeout(() => {
+      if (document.head.contains(link)) {
+        document.head.removeChild(link);
+      }
+    }, timeout);
+  }
+
+  return link;
 }; 

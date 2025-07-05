@@ -10,62 +10,65 @@ const STATIC_CACHE = [
   '/manifest.json'
 ];
 
-// Install event - cache critical resources
+// Evento de instalación - cachear recursos críticos
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Caching critical resources');
+        console.log('Cacheando recursos críticos');
         return cache.addAll(CRITICAL_RESOURCES);
       })
       .then(() => {
-        console.log('Service Worker installed');
+        console.log('Service Worker instalado');
         return self.skipWaiting();
       })
   );
 });
 
-// Activate event - clean up old caches
+// Evento de activación - limpiar caches antiguos
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
+            console.log('Eliminando cache antiguo:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     }).then(() => {
-      console.log('Service Worker activated');
+      console.log('Service Worker activado');
       return self.clients.claim();
     })
   );
 });
 
-// Fetch event - serve from cache when possible
+// Evento de fetch - servir desde cache cuando sea posible
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET requests
+  // Omitir solicitudes que no sean GET
   if (request.method !== 'GET') {
     return;
   }
 
-  // Handle critical resources
+  // Manejar recursos críticos
   if (CRITICAL_RESOURCES.includes(url.pathname)) {
     event.respondWith(
       caches.match(request)
         .then((response) => {
-          return response || fetch(request);
+          return response || fetch(request).catch(() => {
+            console.log('Error fetching critical resource:', url.pathname);
+            return new Response('Resource not available', { status: 404 });
+          });
         })
     );
     return;
   }
 
-  // Handle static assets
+  // Manejar activos estáticos
   if (STATIC_CACHE.includes(url.pathname)) {
     event.respondWith(
       caches.match(request)
@@ -81,13 +84,16 @@ self.addEventListener('fetch', (event) => {
               });
             }
             return response;
+          }).catch((error) => {
+            console.log('Error fetching static resource:', url.pathname, error);
+            return new Response('Static resource not available', { status: 404 });
           });
         })
     );
     return;
   }
 
-  // Handle API requests - network first, then cache
+  // Manejar solicitudes de API - red primero, luego cache
   if (url.pathname.includes('/api/') || url.hostname.includes('freetogame.com')) {
     event.respondWith(
       fetch(request)
@@ -100,14 +106,17 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(() => {
-          return caches.match(request);
+        .catch((error) => {
+          console.log('Error fetching API:', url.pathname, error);
+          return caches.match(request).catch(() => {
+            return new Response('API not available', { status: 503 });
+          });
         })
     );
     return;
   }
 
-  // Handle image requests - cache first, then network
+  // Manejar solicitudes de imágenes - cache primero, luego red
   if (request.destination === 'image') {
     event.respondWith(
       caches.match(request)
@@ -123,9 +132,23 @@ self.addEventListener('fetch', (event) => {
               });
             }
             return response;
+          }).catch((error) => {
+            console.log('Error fetching image:', url.pathname, error);
+            // Intentar servir placeholder si es una imagen
+            return caches.match('/placeholder-logo.png').catch(() => {
+              return new Response('Image not available', { status: 404 });
+            });
           });
         })
     );
     return;
   }
+
+  // Estrategia de fallback para otras solicitudes
+  event.respondWith(
+    fetch(request).catch((error) => {
+      console.log('Error fetching resource:', url.pathname, error);
+      return new Response('Resource not available', { status: 404 });
+    })
+  );
 }); 

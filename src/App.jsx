@@ -7,15 +7,13 @@ import "react-toastify/dist/ReactToastify.css"
 import Header from "./components/Header"
 import Footer from "./components/Footer"
 import ProductList from "./components/ProductList"
-import ProductDetail from "./components/ProductDetail"
-import Cart from "./components/Cart"
-import Login from "./components/Login"
 import GameFilters from "./components/GameFilters"
 import Offers from "./components/Offers"
 import MustHave from "./components/MustHave"
 
 import ProtectedRoute from "./components/ProtectedRoute"
 import SEO from "./components/SEO"
+import SplashScreen from "./components/SplashScreen"
 import { useGames } from "./hooks/useGames"
 import { useGameFilters } from "./hooks/useGameFilters"
 import { useCart } from "./hooks/useCart"
@@ -24,7 +22,7 @@ import { ProductProvider } from "./context/ProductContext"
 import SkipLink from "./components/SkipLink"
 import { usePagination } from "./hooks/usePagination"
 import { FavoritesProvider } from "./context/FavoritesContext"
-import { isExternalImage, getProxiedImageUrl } from "./utils/imageProxy"
+import { useLCPOptimization } from "./hooks/useLCPOptimization"
 import { 
   LazyAdmin, 
   LazyPerfil, 
@@ -32,8 +30,13 @@ import {
   LazyContacto, 
   LazyPaymentSuccess, 
   LazyPaymentFailure,
-  LazyWebVitalsMonitor 
+  LazyWebVitalsMonitor,
+  LazyProductDetail,
+  LazyCart,
+  LazyLogin,
+  LazySplashScreen
 } from "./components/LazyComponents"
+import LCPMonitor from "./components/LCPMonitor"
 
 function App() {
   const { games, loading, error, usingMockData, isInitialLoad, refetchGames, forceMockData } = useGames();
@@ -58,6 +61,11 @@ function App() {
     currentPageGames
   } = useGameFilters(games);
 
+  // Splash Screen state - sincronizado con la carga real de datos
+  const [showSplash, setShowSplash] = useState(true);
+  const [splashProgress, setSplashProgress] = useState(0);
+  const [splashText, setSplashText] = useState('Iniciando...');
+
   const {
     items: cartItems,
     isOpen: isCartOpen,
@@ -73,6 +81,12 @@ function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const location = useLocation();
   const [cartShouldRender, setCartShouldRender] = useState(false);
+
+  // LCP Optimization hook
+  const { preloadCriticalImages } = useLCPOptimization(
+    games.map(game => game.thumbnail).filter(Boolean),
+    { preloadCount: 4, timeout: 10000 }
+  );
 
   // Optimización: Memoizar cálculos costosos
   const gamesWithDiscount = useMemo(() => 
@@ -151,40 +165,6 @@ function App() {
     if (isCartOpen) setCartShouldRender(true);
   }, [isCartOpen]);
 
-  // Precarga dinámica para optimización de LCP
-  useEffect(() => {
-    if (games && games.length > 0) {
-      const firstGame = games[0];
-      if (firstGame && firstGame.thumbnail) {
-        // Usar proxy para imágenes externas para prevenir cookies de terceros
-        const imageUrl = isExternalImage(firstGame.thumbnail) 
-          ? getProxiedImageUrl(firstGame.thumbnail)
-          : firstGame.thumbnail;
-        
-        // Crear un enlace de precarga para la primera imagen del producto
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'image';
-        link.href = imageUrl;
-        link.fetchpriority = 'high';
-        
-        // Agregar crossorigin para imágenes externas
-        if (isExternalImage(firstGame.thumbnail)) {
-          link.crossOrigin = 'anonymous';
-        }
-        
-        document.head.appendChild(link);
-        
-        // Limpiar el enlace después de un retraso
-        setTimeout(() => {
-          if (document.head.contains(link)) {
-            document.head.removeChild(link);
-          }
-        }, 5000);
-      }
-    }
-  }, [games]);
-
   const handleCartExited = () => setCartShouldRender(false);
 
   const toggleLogin = () => {
@@ -240,25 +220,87 @@ function App() {
     });
   }, [originalClearCart]);
 
+  // Sincronizar splash screen con el estado real de carga
+  useEffect(() => {
+    console.log('Estado de carga:', { isInitialLoad, loading, gamesLength: games.length, error });
+    
+    if (loading || isInitialLoad) {
+      // Cargando datos - progreso intermedio
+      setSplashProgress(45);
+      setSplashText('Conectando con el servidor...');
+      
+      // Simular progreso durante la carga
+      const progressInterval = setInterval(() => {
+        setSplashProgress(prev => {
+          if (prev < 85) {
+            setSplashText('Cargando catálogo de juegos...');
+            return prev + 10;
+          } else {
+            setSplashText('Preparando interfaz...');
+            return prev;
+          }
+        });
+      }, 500);
+      
+      return () => clearInterval(progressInterval);
+    } else if (games.length > 0) {
+      // Datos cargados - completar y ocultar
+      setSplashProgress(100);
+      setSplashText('¡Bienvenido a Mi Nuevo Vicio!');
+      
+      // Ocultar splash screen después de mostrar el mensaje final
+      setTimeout(() => {
+        console.log('Datos cargados - ocultando splash screen');
+        setShowSplash(false);
+      }, 1500);
+    } else if (error) {
+      // Error - mostrar mensaje y ocultar
+      setSplashProgress(100);
+      setSplashText('Cargando datos de respaldo...');
+      
+      setTimeout(() => {
+        console.log('Error en carga - ocultando splash screen');
+        setShowSplash(false);
+      }, 2000);
+    }
+  }, [isInitialLoad, loading, games.length, error]);
+
+  // Callback para cuando la splash screen se complete manualmente
+  const handleSplashComplete = useCallback(() => {
+    console.log('Splash screen completada manualmente');
+    setShowSplash(false);
+  }, []);
+
   return (
-    <AuthProvider>
-      <ProductProvider>
-        <FavoritesProvider>
-          <SEO />
+    <>
+      {/* Splash Screen */}
+      {showSplash && (
+        <SplashScreen 
+          onComplete={handleSplashComplete}
+          progress={splashProgress}
+          loadingText={splashText}
+        />
+      )}
+      
+      <AuthProvider>
+        <ProductProvider>
+          <FavoritesProvider>
+                    <SEO />
           <SkipLink />
+          <LCPMonitor />
           <div className="d-flex flex-column min-vh-100" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <ToastContainer
-              position="top-right"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-            />
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+              />
             
 
             
@@ -271,7 +313,7 @@ function App() {
             <main 
               id="main-content"
               className="flex-grow-1" 
-              style={{ paddingTop: '8rem' }}
+              style={{ paddingTop: '130px' }}
               role="main"
               aria-label="Contenido principal"
             >
@@ -392,7 +434,7 @@ function App() {
                   </>
                 } />
                 <Route path="/product/:id" element={
-                  <ProductDetail 
+                  <LazyProductDetail 
                     addToCart={addToCart}
                     removeFromCart={removeFromCart}
                     cartItems={cartItems}
@@ -403,7 +445,7 @@ function App() {
                   path="/login"
                   element={
                     isLoginOpen ? (
-                      <Login closeLogin={() => setIsLoginOpen(false)} />
+                      <LazyLogin closeLogin={() => setIsLoginOpen(false)} />
                     ) : (
                       <Navigate to="/" replace />
                     )
@@ -425,11 +467,11 @@ function App() {
               </Routes>
 
               {isLoginOpen && (
-                <Login closeLogin={() => setIsLoginOpen(false)} />
+                <LazyLogin closeLogin={() => setIsLoginOpen(false)} />
               )}
 
               {cartShouldRender && (
-                <Cart
+                <LazyCart
                   cart={cartItems}
                   removeFromCart={removeFromCart}
                   closeCart={closeCart}
@@ -448,6 +490,7 @@ function App() {
         </FavoritesProvider>
       </ProductProvider>
     </AuthProvider>
+    </>
   )
 }
 

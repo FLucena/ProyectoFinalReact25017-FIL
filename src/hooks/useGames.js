@@ -54,8 +54,8 @@ const INSTANT_MOCK = [
 ];
 
 export const useGames = () => {
-  const [games, setGames] = useState(INSTANT_MOCK);
-  const [loading, setLoading] = useState(false);
+  const [games, setGames] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [usingMockData, setUsingMockData] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -148,6 +148,9 @@ export const useGames = () => {
 
   // Carga completa de datos en segundo plano
   const loadFullData = useCallback(async () => {
+    setLoading(true);
+    setIsInitialLoad(true);
+    
     // Temporalmente forzar modo producción para probar API real
     const isDevelopment = false;
     if (isDevelopment) {
@@ -158,9 +161,13 @@ export const useGames = () => {
         setError("🛠️ Modo desarrollo: usando datos de demostración");
       } catch (mockErr) {
         setError("❌ Error al cargar datos de demostración");
+      } finally {
+        setLoading(false);
+        setIsInitialLoad(false);
       }
       return;
     }
+    
     try {
       const data = await attemptFetchFromProxies();
       setGames(data);
@@ -179,14 +186,15 @@ export const useGames = () => {
         console.error("Error al cargar datos mock:", mockErr);
         setError("❌ Error al cargar datos de demostración");
       }
+    } finally {
+      setLoading(false);
+      setIsInitialLoad(false);
     }
   }, [attemptFetchFromProxies]);
 
   useEffect(() => {
-    // Cargar datos reales en segundo plano después de montar
-    setTimeout(() => {
-      loadFullData();
-    }, 100);
+    // Cargar datos reales inmediatamente al montar
+    loadFullData();
   }, [loadFullData]);
 
   // Función para recargar datos manualmente
