@@ -18,6 +18,7 @@
     "@mercadopago/sdk-react": "^1.0.3",
     "bootstrap": "^5.3.6",
     "date-fns": "^4.1.0",
+    "lodash-es": "^4.17.21",
     "lucide-react": "^0.454.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.9",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.4.1",
+    "terser": "^5.43.1",
     "vite": "^6.3.5"
   }
 }
