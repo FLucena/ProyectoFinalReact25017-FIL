@@ -24,11 +24,11 @@ const LCPMonitor = () => {
             
             if (lcpValue < 2500) {
               setIsOptimized(true);
-              console.log('✅ LCP Optimized:', lcpValue.toFixed(0) + 'ms');
+              // LCP Optimizado
             } else if (lcpValue < 4000) {
-              console.log('⚠️ LCP Needs Improvement:', lcpValue.toFixed(0) + 'ms');
+              // LCP Necesita Mejora
             } else {
-              console.log('❌ LCP Poor:', lcpValue.toFixed(0) + 'ms');
+              // LCP Pobre
             }
           }
         });
@@ -41,14 +41,7 @@ const LCPMonitor = () => {
 
     const logLCPElement = () => {
       if (lcpElement) {
-        console.log('🎯 LCP Element:', {
-          tagName: lcpElement.tagName,
-          src: lcpElement.src,
-          className: lcpElement.className,
-          id: lcpElement.id,
-          width: lcpElement.width,
-          height: lcpElement.height
-        });
+        // LCP Element registrado
       }
     };
 

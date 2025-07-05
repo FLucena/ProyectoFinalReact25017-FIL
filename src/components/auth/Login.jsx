@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { X, Eye, EyeOff } from "lucide-react"
 import { FaTimes, FaEye, FaEyeSlash, FaUser, FaLock, FaEnvelope, FaSignInAlt, FaUserPlus } from "react-icons/fa"
-import { useAuth } from "../context/AuthContext"
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useLocation } from "react-router-dom"
 import { toast } from "react-toastify"
 
@@ -165,7 +165,7 @@ const Login = ({ closeLogin }) => {
 
           <button 
             type="submit" 
-            className="btn btn-danger w-100 py-2 mb-3 d-flex align-items-center justify-content-center gap-2"
+            className="btn btn-primary w-100 py-2 mb-3 d-flex align-items-center justify-content-center gap-2"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -185,7 +185,7 @@ const Login = ({ closeLogin }) => {
         <div className="text-center">
           <button 
             onClick={toggleMode} 
-            className="btn btn-link text-danger p-0"
+            className="btn btn-link text-primary p-0"
             disabled={isLoading}
           >
             {isRegister ? "¿Ya tienes una cuenta? Inicia sesión" : "¿No tienes una cuenta? Regístrate"}

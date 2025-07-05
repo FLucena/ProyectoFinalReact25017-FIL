@@ -42,13 +42,13 @@ export const PageButton = styled.button`
 `;
 
 export const ActivePageButton = styled(PageButton)`
-  background-color: #dc3545;
-  border-color: #dc3545;
+  background-color: #0d6efd;
+  border-color: #0d6efd;
   color: white;
   
   &:hover {
-    background-color: #c82333;
-    border-color: #c82333;
+    background-color: #0a58ca;
+    border-color: #0a58ca;
   }
 `;
 

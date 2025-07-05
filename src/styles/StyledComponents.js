@@ -45,7 +45,7 @@ export const Button = styled.button`
   &:focus {
     outline: 2px solid ${theme.colors.primary};
     outline-offset: 2px;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
   }
   
   &:disabled {
@@ -67,7 +67,7 @@ export const PrimaryButton = styled(Button)`
   color: ${theme.colors.white};
   
   &:hover:not(:disabled) {
-    background-color: #c82333;
+    background-color: #0a58ca;
     transform: translateY(-1px);
   }
   
@@ -113,7 +113,7 @@ export const Card = styled.div`
   }
   
   &:focus-within {
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
   }
   
   @media (min-width: ${theme.breakpoints.md}) {
@@ -153,7 +153,7 @@ export const Input = styled.input`
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary};
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
   }
   
   &::placeholder {
@@ -175,7 +175,7 @@ export const Select = styled.select`
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary};
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
   }
 `;
 

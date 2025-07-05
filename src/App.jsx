@@ -1,42 +1,22 @@
 "use client"
 
 import { useState, useEffect, useMemo, useCallback } from "react"
-import { Routes, Route, useLocation, Navigate } from "react-router-dom"
-import { ToastContainer, toast } from "react-toastify"
+import { useLocation } from "react-router-dom"
+import { toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import Header from "./components/Header"
-import Footer from "./components/Footer"
-import ProductList from "./components/ProductList"
-import GameFilters from "./components/GameFilters"
-import Offers from "./components/Offers"
-import MustHave from "./components/MustHave"
-
-import ProtectedRoute from "./components/ProtectedRoute"
-import SEO from "./components/SEO"
-import SplashScreen from "./components/SplashScreen"
 import { useGames } from "./hooks/useGames"
 import { useGameFilters } from "./hooks/useGameFilters"
 import { useCart } from "./hooks/useCart"
 import { AuthProvider } from "./context/AuthContext"
 import { ProductProvider } from "./context/ProductContext"
-import SkipLink from "./components/SkipLink"
 import { usePagination } from "./hooks/usePagination"
 import { FavoritesProvider } from "./context/FavoritesContext"
 import { useLCPOptimization } from "./hooks/useLCPOptimization"
-import { 
-  LazyAdmin, 
-  LazyPerfil, 
-  LazySobreProyecto, 
-  LazyContacto, 
-  LazyPaymentSuccess, 
-  LazyPaymentFailure,
-  LazyWebVitalsMonitor,
-  LazyProductDetail,
-  LazyCart,
-  LazyLogin,
-  LazySplashScreen
-} from "./components/LazyComponents"
-import LCPMonitor from "./components/LCPMonitor"
+import AppLayout from './components/layout/AppLayout';
+import MainRoutes from './components/layout/MainRoutes';
+import CartManager from './components/cart/CartManager';
+import LoginManager from './components/auth/LoginManager';
+import SplashScreen from "./components/splash/SplashScreen";
 
 function App() {
   const { games, loading, error, usingMockData, isInitialLoad, refetchGames, forceMockData } = useGames();
@@ -222,7 +202,6 @@ function App() {
 
   // Sincronizar splash screen con el estado real de carga
   useEffect(() => {
-    console.log('Estado de carga:', { isInitialLoad, loading, gamesLength: games.length, error });
     
     if (loading || isInitialLoad) {
       // Cargando datos - progreso intermedio
@@ -250,7 +229,6 @@ function App() {
       
       // Ocultar splash screen después de mostrar el mensaje final
       setTimeout(() => {
-        console.log('Datos cargados - ocultando splash screen');
         setShowSplash(false);
       }, 1500);
     } else if (error) {
@@ -259,7 +237,6 @@ function App() {
       setSplashText('Cargando datos de respaldo...');
       
       setTimeout(() => {
-        console.log('Error en carga - ocultando splash screen');
         setShowSplash(false);
       }, 2000);
     }
@@ -267,13 +244,13 @@ function App() {
 
   // Callback para cuando la splash screen se complete manualmente
   const handleSplashComplete = useCallback(() => {
-    console.log('Splash screen completada manualmente');
     setShowSplash(false);
   }, []);
 
+
+
   return (
     <>
-      {/* Splash Screen */}
       {showSplash && (
         <SplashScreen 
           onComplete={handleSplashComplete}
@@ -281,217 +258,66 @@ function App() {
           loadingText={splashText}
         />
       )}
-      
       <AuthProvider>
         <ProductProvider>
           <FavoritesProvider>
-                    <SEO />
-          <SkipLink />
-          <LCPMonitor />
-          <div className="d-flex flex-column min-vh-100" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-              <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
+            <AppLayout cartCount={cartCount} toggleCart={toggleCart} toggleLogin={toggleLogin}>
+              <MainRoutes
+                showSplash={showSplash}
+                games={games}
+                filteredGames={filteredGames}
+                offersPagination={offersPagination}
+                mustHavePagination={mustHavePagination}
+                // Props para filtros
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                selectedPlatform={selectedPlatform}
+                setSelectedPlatform={setSelectedPlatform}
+                selectedGenre={selectedGenre}
+                setSelectedGenre={setSelectedGenre}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+                clearFilters={clearFilters}
+                hasActiveFilters={hasActiveFilters}
+                platforms={platforms}
+                genres={genres}
+                // Props para paginación
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                totalPages={totalPages}
+                totalGames={totalGames}
+                currentPageGames={currentPageGames}
+                // Props para carrito
+                addToCart={addToCart}
+                removeFromCart={removeFromCart}
+                updateQuantity={updateQuantity}
+                cartItems={cartItems}
+                // Props para estado de carga
+                loading={loading}
+                error={error}
+                usingMockData={usingMockData}
+                isInitialLoad={isInitialLoad}
+                refetchGames={refetchGames}
+                forceMockData={forceMockData}
               />
-            
-
-            
-            <Header
-              cartCount={cartCount}
-              toggleCart={toggleCart}
-              toggleLogin={toggleLogin}
-            />
-
-            <main 
-              id="main-content"
-              className="flex-grow-1" 
-              style={{ paddingTop: '130px' }}
-              role="main"
-              aria-label="Contenido principal"
-            >
-              <Routes>
-                <Route path="/" element={
-                  <>
-                    {!(usingMockData && isInitialLoad) && showFilters && (
-                      <GameFilters
-                        searchTerm={searchTerm}
-                        setSearchTerm={setSearchTerm}
-                        selectedPlatform={selectedPlatform}
-                        setSelectedPlatform={setSelectedPlatform}
-                        selectedGenre={selectedGenre}
-                        setSelectedGenre={setSelectedGenre}
-                        sortBy={sortBy}
-                        setSortBy={setSortBy}
-                        clearFilters={clearFilters}
-                        hasActiveFilters={hasActiveFilters}
-                        platforms={platforms}
-                        genres={genres}
-                        currentPage={currentPage}
-                        setCurrentPage={setCurrentPage}
-                        totalPages={totalPages}
-                        totalGames={totalGames}
-                        currentPageGames={currentPageGames}
-                        pageCounts={pageCounts}
-                      />
-                    )}
-                    <ProductList 
-                      products={filteredGames.slice(0, 4)}
-                      addToCart={addToCart} 
-                      removeFromCart={removeFromCart}
-                      cartItems={cartItems}
-                      updateQuantity={updateQuantity}
-                      loading={loading}
-                      error={error}
-                      usingMockData={usingMockData}
-                      isInitialLoad={isInitialLoad}
-                      onRefetch={refetchGames}
-                      onForceMock={forceMockData}
-                    />
-                  </>
-                } />
-                <Route path="/ofertas" element={
-                  <>
-                    {showFilters && (
-                      <GameFilters
-                        searchTerm={searchTerm}
-                        setSearchTerm={setSearchTerm}
-                        selectedPlatform={selectedPlatform}
-                        setSelectedPlatform={setSelectedPlatform}
-                        selectedGenre={selectedGenre}
-                        setSelectedGenre={setSelectedGenre}
-                        sortBy={sortBy}
-                        setSortBy={setSortBy}
-                        clearFilters={clearFilters}
-                        hasActiveFilters={hasActiveFilters}
-                        platforms={platforms}
-                        genres={genres}
-                        currentPage={offersPagination.currentPage}
-                        setCurrentPage={offersPagination.setCurrentPage}
-                        totalPages={offersPagination.totalPages}
-                        totalGames={offersPagination.totalItems}
-                        currentPageGames={offersPagination.currentPageItems}
-                        pageCounts={pageCounts}
-                      />
-                    )}
-                    <Offers 
-                      games={offersPagination.paginatedItems} 
-                      addToCart={addToCart}
-                      removeFromCart={removeFromCart}
-                      cartItems={cartItems}
-                      updateQuantity={updateQuantity}
-                      loading={loading}
-                      error={error}
-                      usingMockData={usingMockData}
-                      onRefetch={refetchGames}
-                      onForceMock={forceMockData}
-                    />
-                  </>
-                } />
-                <Route path="/infaltables" element={
-                  <>
-                    {showFilters && (
-                      <GameFilters
-                        searchTerm={searchTerm}
-                        setSearchTerm={setSearchTerm}
-                        selectedPlatform={selectedPlatform}
-                        setSelectedPlatform={setSelectedPlatform}
-                        selectedGenre={selectedGenre}
-                        setSelectedGenre={setSelectedGenre}
-                        sortBy={sortBy}
-                        setSortBy={setSortBy}
-                        clearFilters={clearFilters}
-                        hasActiveFilters={hasActiveFilters}
-                        platforms={platforms}
-                        genres={genres}
-                        currentPage={mustHavePagination.currentPage}
-                        setCurrentPage={mustHavePagination.setCurrentPage}
-                        totalPages={mustHavePagination.totalPages}
-                        totalGames={mustHavePagination.totalItems}
-                        currentPageGames={mustHavePagination.currentPageItems}
-                        pageCounts={pageCounts}
-                      />
-                    )}
-                    <MustHave 
-                      games={mustHavePagination.paginatedItems} 
-                      addToCart={addToCart}
-                      removeFromCart={removeFromCart}
-                      cartItems={cartItems}
-                      updateQuantity={updateQuantity}
-                      loading={loading}
-                      error={error}
-                      usingMockData={usingMockData}
-                      onRefetch={refetchGames}
-                      onForceMock={forceMockData}
-                    />
-                  </>
-                } />
-                <Route path="/product/:id" element={
-                  <LazyProductDetail 
-                    addToCart={addToCart}
-                    removeFromCart={removeFromCart}
-                    cartItems={cartItems}
-                    updateQuantity={updateQuantity}
-                  />
-                } />
-                <Route
-                  path="/login"
-                  element={
-                    isLoginOpen ? (
-                      <LazyLogin closeLogin={() => setIsLoginOpen(false)} />
-                    ) : (
-                      <Navigate to="/" replace />
-                    )
-                  }
-                />
-                <Route 
-                  path="/perfil" 
-                  element={
-                    <ProtectedRoute>
-                      <LazyPerfil />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route path="/admin" element={<LazyAdmin />} />
-                <Route path="/sobre-proyecto" element={<LazySobreProyecto />} />
-                <Route path="/contacto" element={<LazyContacto />} />
-                <Route path="/payment/success" element={<LazyPaymentSuccess />} />
-                <Route path="/payment/failure" element={<LazyPaymentFailure />} />
-              </Routes>
-
-              {isLoginOpen && (
-                <LazyLogin closeLogin={() => setIsLoginOpen(false)} />
-              )}
-
-              {cartShouldRender && (
-                <LazyCart
-                  cart={cartItems}
-                  removeFromCart={removeFromCart}
-                  closeCart={closeCart}
-                  updateQuantity={updateQuantity}
-                  clearCart={clearCart}
-                  isOpen={isCartOpen}
-                  onExited={handleCartExited}
-                  toggleLogin={toggleLogin}
-                />
-              )}
-            </main>
-
-            <Footer />
-            <LazyWebVitalsMonitor />
-          </div>
-        </FavoritesProvider>
-      </ProductProvider>
-    </AuthProvider>
+              <LoginManager isLoginOpen={isLoginOpen} closeLogin={() => setIsLoginOpen(false)} />
+              <CartManager
+                cartShouldRender={cartShouldRender}
+                cartItems={cartItems}
+                removeFromCart={removeFromCart}
+                closeCart={closeCart}
+                updateQuantity={updateQuantity}
+                clearCart={clearCart}
+                isOpen={isCartOpen}
+                onExited={handleCartExited}
+                toggleLogin={toggleLogin}
+              />
+            </AppLayout>
+          </FavoritesProvider>
+        </ProductProvider>
+      </AuthProvider>
     </>
-  )
+  );
 }
 
 export default App

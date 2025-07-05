@@ -13,10 +13,10 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        console.log('SW registered: ', registration);
+        // Service Worker registrado exitosamente
       })
       .catch((registrationError) => {
-        console.log('SW registration failed: ', registrationError);
+        // Service Worker falló al registrarse
       });
   });
 }

@@ -109,81 +109,53 @@ export const useGames = () => {
     }
   }, [validateGameData]);
 
-  // Proxies CORS más confiables y actualizados con reintentos
+  // Lista de proxies CORS para intentar (ordenados por confiabilidad)
+  const proxies = [
+    "https://cors.bridged.cc/",
+    "https://api.allorigins.win/raw?url=",
+    "https://thingproxy.freeboard.io/fetch/",
+    "https://corsproxy.io/?",
+    "https://api.codetabs.com/v1/proxy?quest=",
+    "https://cors.io/?"
+  ];
+
   const attemptFetchFromProxies = useCallback(async () => {
-    const proxies = [
-      "https://api.allorigins.win/raw?url=",
-      "https://corsproxy.io/?",
-      "https://api.codetabs.com/v1/proxy?quest=",
-      "https://cors-anywhere.herokuapp.com/",
-      "https://cors.bridged.cc/",
-      "https://proxy.cors.sh/",
-      "https://corsproxy.io/?",
-      "https://api.allorigins.win/raw?url=",
-      "https://thingproxy.freeboard.io/fetch/"
-    ];
-    
     const targetUrl = "https://www.freetogame.com/api/games";
-    const maxRetries = 2; // Reintentar cada proxy hasta 2 veces
     
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      for (const proxy of proxies) {
-        try {
-          let url;
-          
-          if (proxy.includes("corsproxy.io")) {
-            url = `${proxy}${targetUrl}`;
-          } else if (proxy.includes("codetabs.com")) {
-            url = `${proxy}${targetUrl}`;
-          } else if (proxy.includes("cors-anywhere")) {
-            url = `${proxy}${targetUrl}`;
-          } else if (proxy.includes("bridged.cc")) {
-            url = `${proxy}${targetUrl}`;
-          } else if (proxy.includes("proxy.cors.sh")) {
-            url = `${proxy}${targetUrl}`;
-          } else {
-            url = `${proxy}${encodeURIComponent(targetUrl)}`;
-          }
-          
-          console.log(`Intentando proxy: ${proxy} (intento ${attempt + 1}/${maxRetries})`);
-          const data = await fetchWithTimeout(url, 8000); // Aumentar timeout
-          
-          if (data && data.length > 0) {
-            console.log(`Proxy exitoso: ${proxy}`);
-            return data;
-          }
-        } catch (err) {
-          console.warn(`Proxy falló: ${proxy} (intento ${attempt + 1}/${maxRetries})`, err.message);
-          
-          // Si es un error de CSP o 404, no reintentar este proxy
-          if (err.message.includes('CSP') || err.message.includes('404') || err.message.includes('Failed to fetch')) {
-            console.log(`Proxy ${proxy} no disponible, saltando...`);
-            continue;
-          }
-          
-          // Si es el último intento para este proxy, continuar al siguiente
-          if (attempt === maxRetries - 1) {
-            continue;
-          }
-          
-          // Esperar un poco antes del siguiente intento
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+    for (let i = 0; i < proxies.length; i++) {
+      const proxy = proxies[i];
+      let url;
+      
+      // Construir URL según el formato del proxy
+      if (proxy.includes('allorigins.win')) {
+        url = `${proxy}${encodeURIComponent(targetUrl)}`;
+      } else if (proxy.includes('codetabs.com')) {
+        url = `${proxy}${targetUrl}`;
+      } else {
+        url = `${proxy}${targetUrl}`;
       }
       
-      // Si llegamos aquí, todos los proxies fallaron en este intento
-      if (attempt < maxRetries - 1) {
-        console.log(`Todos los proxies fallaron en el intento ${attempt + 1}, reintentando...`);
-        await new Promise(resolve => setTimeout(resolve, 2000));
+      try {
+        const data = await fetchWithTimeout(url, 5000); // Timeout más corto por proxy
+        if (data && data.length > 0) {
+          console.log(`✅ Proxy exitoso: ${proxy}`);
+          return data;
+        }
+        throw new Error("El proxy no devolvió datos válidos");
+      } catch (err) {
+        console.log(`❌ Proxy falló: ${proxy} - ${err.message}`);
+        // Continuar con el siguiente proxy
+        continue;
       }
     }
     
-    throw new Error("Todos los proxies CORS fallaron después de múltiples intentos");
+    // Si llegamos aquí, todos los proxies fallaron
+    console.log("❌ Todos los proxies CORS fallaron");
+    throw new Error("Todos los proxies CORS fallaron");
   }, [fetchWithTimeout]);
 
   // Carga completa de datos en segundo plano
   const loadFullData = useCallback(async () => {
-    console.log("🔄 Iniciando carga de datos...");
     setLoading(true);
     setIsInitialLoad(true);
     
@@ -210,7 +182,6 @@ export const useGames = () => {
     
     // En producción, intentar API real con timeout más largo para dar tiempo a reintentos
     const apiTimeout = setTimeout(async () => {
-      console.log("Timeout de API alcanzado después de múltiples intentos, usando datos mock");
       try {
         const mockResponse = await fetchMockGames(500);
         setGames(mockResponse.data);
@@ -226,10 +197,8 @@ export const useGames = () => {
     }, 25000); // 25 segundos de timeout para dar tiempo a reintentos
     
     try {
-      console.log("🌐 Intentando obtener datos de la API real...");
       const data = await attemptFetchFromProxies();
       clearTimeout(apiTimeout);
-      console.log("✅ Datos de API obtenidos exitosamente:", data.length, "juegos");
       setGames(data);
       setUsingMockData(false);
       setError(null);

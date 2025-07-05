@@ -72,7 +72,7 @@ const Logo = styled.img`
   width: 200px;
   height: auto;
   max-width: 80vw;
-  filter: drop-shadow(0 10px 20px rgba(220, 53, 69, 0.3));
+  filter: drop-shadow(0 10px 20px rgba(13, 110, 253, 0.3));
   animation: ${pulse} 2s ease-in-out infinite;
   
   @media (max-width: 768px) {
@@ -86,7 +86,7 @@ const Title = styled.h1`
   font-weight: 700;
   margin: 0;
   text-align: center;
-  background: linear-gradient(45deg, #dc3545, #ff6b6b);
+  background: linear-gradient(45deg, #0d6efd, #0a58ca);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -136,7 +136,7 @@ const ProgressBar = styled.div`
     left: 0;
     height: 100%;
     width: ${props => props.$progress}%;
-    background: linear-gradient(90deg, #dc3545, #ff6b6b);
+    background: linear-gradient(90deg, #0d6efd, #0a58ca);
     border-radius: 2px;
     transition: width 0.3s ease;
   }
@@ -153,7 +153,7 @@ const Dot = styled.div`
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #dc3545;
+  background: #0d6efd;
   animation: ${pulse} 1.4s ease-in-out infinite;
   animation-delay: ${props => props.$delay}s;
 `;
@@ -165,7 +165,6 @@ const SimpleSplashScreen = ({ onComplete, progress = 0, loadingText = 'Iniciando
   // Timeout de seguridad (máximo 8 segundos)
   useEffect(() => {
     const safetyTimer = setTimeout(() => {
-      console.log('SplashScreen: Timeout de seguridad');
       setIsExiting(true);
       setTimeout(() => {
         setIsVisible(false);
@@ -180,7 +179,6 @@ const SimpleSplashScreen = ({ onComplete, progress = 0, loadingText = 'Iniciando
   useEffect(() => {
     if (progress >= 100) {
       const hideTimer = setTimeout(() => {
-        console.log('SplashScreen: Progreso completado, ocultando...');
         setIsExiting(true);
         setTimeout(() => {
           setIsVisible(false);
@@ -209,7 +207,7 @@ const SimpleSplashScreen = ({ onComplete, progress = 0, loadingText = 'Iniciando
       </LogoContainer>
       
       <Title>Mi Nuevo Vicio</Title>
-      <Subtitle>Tu próxima adicción gaming</Subtitle>
+      <Subtitle>Tu próxima adicción en el gaming</Subtitle>
       
       <LoadingContainer>
         <LoadingText>{loadingText}</LoadingText>

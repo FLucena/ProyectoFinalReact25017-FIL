@@ -2,14 +2,13 @@
 
 import { Row, Col } from "react-bootstrap"
 import ProductCard from "./ProductCard"
-import ProductCardSkeleton from "./ui/ProductCardSkeleton"
-import MockDataNotification from "./MockDataNotification"
-import { useState } from "react"
-import { useListLayoutShift } from "../hooks/useLayoutShift"
+import ProductCardSkeleton from '../../components/ui/ProductCardSkeleton';
+import MockDataNotification from '../../components/MockDataNotification';
+import { useListLayoutShift } from '../../hooks/useLayoutShift';
 import React from "react"
 
 const ProductList = ({ 
-  products, 
+  filteredGames, 
   addToCart, 
   removeFromCart, 
   cartItems, 
@@ -18,11 +17,11 @@ const ProductList = ({
   error,
   usingMockData,
   isInitialLoad = false,
-  onRefetch,
-  onForceMock
+  refetchGames,
+  forceMockData
 }) => {
-  // Validación adicional para asegurar que products sea un array
-  const safeProducts = Array.isArray(products) ? products : [];
+  // Validación adicional para asegurar que filteredGames sea un array
+  const safeProducts = Array.isArray(filteredGames) ? filteredGames : [];
   
   // Determinar columnas según el ancho de pantalla (Bootstrap breakpoints)
   let columns = 1;
@@ -47,8 +46,8 @@ const ProductList = ({
         <MockDataNotification 
           usingMockData={usingMockData}
           error={error}
-          onRefetch={onRefetch}
-          onForceMock={onForceMock}
+          onRefetch={refetchGames}
+          onForceMock={forceMockData}
         />
         <Row xs={1} sm={2} md={3} lg={4} className="g-4">
           {Array.from({ length: 8 }).map((_, index) => (
@@ -67,8 +66,8 @@ const ProductList = ({
         <MockDataNotification 
           usingMockData={usingMockData}
           error={error}
-          onRefetch={onRefetch}
-          onForceMock={onForceMock}
+          onRefetch={refetchGames}
+          onForceMock={forceMockData}
         />
         <div className="alert alert-info" role="alert">
           No se encontraron juegos
@@ -76,6 +75,8 @@ const ProductList = ({
       </div>
     )
   }
+
+
 
   return (
     <div 
@@ -90,8 +91,8 @@ const ProductList = ({
       <MockDataNotification 
         usingMockData={usingMockData}
         error={error}
-        onRefetch={onRefetch}
-        onForceMock={onForceMock}
+        onRefetch={refetchGames}
+        onForceMock={forceMockData}
       />
       
       <Row xs={1} sm={2} md={3} lg={4} className="g-4">

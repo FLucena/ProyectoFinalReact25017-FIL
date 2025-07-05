@@ -5,9 +5,9 @@ import { FaShoppingCart, FaMinus, FaPlus, FaTrash, FaEye, FaStar, FaHeart, FaSha
 import { toast } from "react-toastify"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import ImageWithFallback from "./ui/ImageWithFallback"
+import ImageWithFallback from '../../components/ui/ImageWithFallback';
 import styled from 'styled-components'
-import { useFavorites } from '../context/FavoritesContext'
+import { useFavorites } from '../../context/FavoritesContext';
 import React from "react"
 
 // Styled-components optimizados
@@ -298,12 +298,12 @@ const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuan
                 {formatPrice(product.price)}
               </span>
               <br />
-              <span className="text-danger fw-bold fs-6">
+              <span className="text-success fw-bold fs-6">
                 {formatPrice(getDiscountPrice())}
               </span>
             </div>
           ) : (
-            <span className="text-danger fw-bold fs-6 mb-2 d-block">
+            <span className="text-primary fw-bold fs-6 mb-2 d-block">
               {formatPrice(product.price)}
             </span>
           )}

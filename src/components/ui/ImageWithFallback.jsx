@@ -83,7 +83,7 @@ const ImageWithFallback = ({
     >
       {imageLoading && !isLCP && (
         <div className="position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
-          <div className="spinner-border spinner-border-sm text-danger" role="status">
+          <div className="spinner-border spinner-border-sm text-primary" role="status">
             <span className="visually-hidden">Cargando imagen...</span>
           </div>
         </div>

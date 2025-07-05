@@ -3,9 +3,9 @@
 import { FaMinus, FaPlus, FaTrash, FaLock, FaShoppingCart, FaCreditCard } from "react-icons/fa"
 import { useState } from "react"
 import { Modal, Button, Offcanvas } from "react-bootstrap"
-import { useAuth } from "../context/AuthContext"
-import ImageWithFallback from "./ui/ImageWithFallback"
-import Checkout from "./Checkout"
+import { useAuth } from '../../context/AuthContext';
+import ImageWithFallback from '../../components/ui/ImageWithFallback';
+import Checkout from '../../components/Checkout';
 import React from "react"
 
 const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOpen = true, toggleLogin, onExited }) => {
@@ -100,7 +100,7 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
             <FaShoppingCart size={20} className="me-2" />
             Carrito de Compras
             {itemCount > 0 && (
-              <span className="badge bg-danger ms-2">{itemCount}</span>
+              <span className="badge bg-primary ms-2">{itemCount}</span>
             )}
           </Offcanvas.Title>
         </Offcanvas.Header>
@@ -163,10 +163,10 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
                           {item.title}
                         </h5>
                         <div className="d-flex justify-content-between align-items-center mb-2">
-                          <p className="text-danger fw-bold mb-0">${item.price.toFixed(2)}</p>
+                          <p className="text-primary fw-bold mb-0">${item.price.toFixed(2)}</p>
                           <p className="text-muted mb-0">Cantidad: {item.quantity}</p>
                         </div>
-                        <p className="text-danger fw-bold mb-2">
+                        <p className="text-primary fw-bold mb-2">
                           Subtotal: ${(item.price * item.quantity).toFixed(2)}
                         </p>
                         <div className="d-flex justify-content-between align-items-center">
@@ -220,7 +220,7 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
             <div className="p-3 border-top bg-white">
               <div className="d-flex justify-content-between mb-3">
                 <span className="fw-bold">Total ({itemCount} {itemCount === 1 ? 'artículo' : 'artículos'}):</span>
-                <span className="fw-bold text-danger">${total.toFixed(2)}</span>
+                <span className="fw-bold text-primary">${total.toFixed(2)}</span>
               </div>
               <Button 
                 variant="danger" 

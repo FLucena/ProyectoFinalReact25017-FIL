@@ -1,7 +1,7 @@
 "use client"
 
 import ProductCard from "./ProductCard"
-import MockDataNotification from "./MockDataNotification"
+import MockDataNotification from '../../components/MockDataNotification';
 import { Alert } from "react-bootstrap"
 
 const MustHave = ({ 
@@ -21,7 +21,7 @@ const MustHave = ({
       <div className="container py-4">
         <h2 className="mb-4">Must Have</h2>
         <div className="text-center">
-          <div className="spinner-border text-danger" role="status">
+          <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Cargando...</span>
           </div>
           <p className="mt-3 text-muted">Cargando juegos destacados...</p>

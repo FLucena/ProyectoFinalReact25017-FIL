@@ -3,7 +3,7 @@
 import { useAuth } from "../context/AuthContext"
 import { Navigate } from "react-router-dom"
 import { useFavorites } from "../context/FavoritesContext"
-import ProductCard from "../components/ProductCard"
+import ProductCard from '../components/products/ProductCard';
 
 const Perfil = () => {
   const { isAuthenticated, user } = useAuth();

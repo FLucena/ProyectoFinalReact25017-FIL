@@ -1,9 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import ProductCard from "./ProductCard"
-import MockDataNotification from "./MockDataNotification"
-import { Container, Row, Col, Alert } from "react-bootstrap"
+import MockDataNotification from '../../components/MockDataNotification';
+import { Alert } from "react-bootstrap"
 
 const Offers = ({ 
   games = [], 
@@ -22,7 +21,7 @@ const Offers = ({
       <div className="container py-4">
         <h2 className="mb-4">Ofertas Especiales</h2>
         <div className="text-center">
-          <div className="spinner-border text-danger" role="status">
+          <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Cargando...</span>
           </div>
           <p className="mt-3 text-muted">Cargando ofertas...</p>

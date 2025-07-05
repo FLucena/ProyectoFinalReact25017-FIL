@@ -4,7 +4,7 @@ import { Container, Row, Col, Button, Badge, Spinner, Alert } from "react-bootst
 import { ArrowLeft, ShoppingCart, Minus, Plus, Trash2, Star } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
-import { useGameDetail } from "../hooks/useGameDetail";
+import { useGameDetail } from '../../hooks/useGameDetail';
 
 const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToCart, removeFromCart, updateQuantity, cartItems }) => {
   const { id } = useParams();
@@ -274,7 +274,7 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
                         ${price.toFixed(2)}
                       </span>
                     )}
-                    <span className="fs-3 fw-bold text-danger">
+                    <span className="fs-3 fw-bold text-success">
                       ${discountedPrice.toFixed(2)}
                     </span>
                   </div>
@@ -313,7 +313,7 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
                       <Plus size={18} />
                     </button>
                   </div>
-                  <span className="ms-3 fs-5 fw-bold text-danger">
+                  <span className="ms-3 fs-5 fw-bold text-primary">
                     Total: ${(discountedPrice * quantity).toFixed(2)}
                   </span>
                 </div>

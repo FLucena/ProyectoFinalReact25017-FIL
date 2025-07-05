@@ -2,8 +2,8 @@
 
 import { useAuth } from "../context/AuthContext"
 import { useProducts } from "../context/ProductContext"
-import ProtectedRoute from "../components/ProtectedRoute"
-import ProductForm from "../components/ProductForm"
+import ProtectedRoute from '../components/auth/ProtectedRoute';
+import ProductForm from '../components/products/ProductForm';
 import { useState, useEffect } from "react"
 import { 
   Plus, 

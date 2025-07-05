@@ -9,10 +9,10 @@ const SobreProyecto = lazy(() => import('../pages/SobreProyecto'));
 const Contacto = lazy(() => import('../pages/Contacto'));
 const PaymentSuccess = lazy(() => import('../pages/PaymentSuccess'));
 const PaymentFailure = lazy(() => import('../pages/PaymentFailure'));
-const ProductDetail = lazy(() => import('./ProductDetail'));
-const Cart = lazy(() => import('./Cart'));
-const Login = lazy(() => import('./Login'));
-const SplashScreen = lazy(() => import('./SplashScreen'));
+const ProductDetail = lazy(() => import('./products/ProductDetail'));
+const Cart = lazy(() => import('./cart/Cart'));
+const Login = lazy(() => import('./auth/Login'));
+const SplashScreen = lazy(() => import('./splash/SplashScreen'));
 
 // Loading component for lazy-loaded routes
 export const LazyRouteLoader = ({ children }) => (

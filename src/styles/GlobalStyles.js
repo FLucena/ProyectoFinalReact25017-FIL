@@ -3,7 +3,7 @@ import { createGlobalStyle } from 'styled-components';
 // Variables CSS para temas consistentes
 const theme = {
   colors: {
-    primary: '#dc3545',
+    primary: '#0d6efd',
     secondary: '#6c757d',
     success: '#198754',
     warning: '#ffc107',
@@ -100,8 +100,8 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   .btn-primary:hover {
-    background-color: #c82333 !important;
-    border-color: #c82333 !important;
+    background-color: #0a58ca !important;
+    border-color: #0a58ca !important;
   }
 
   .card {
@@ -123,7 +123,7 @@ export const GlobalStyles = createGlobalStyle`
   .btn:focus,
   .nav-link:focus,
   .form-control:focus {
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
   }
 `;
 
