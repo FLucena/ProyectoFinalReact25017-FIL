@@ -15,11 +15,11 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Cacheando recursos críticos');
+    
         return cache.addAll(CRITICAL_RESOURCES);
       })
       .then(() => {
-        console.log('Service Worker instalado');
+    
         return self.skipWaiting();
       })
   );
@@ -32,13 +32,13 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Eliminando cache antiguo:', cacheName);
+        
             return caches.delete(cacheName);
           }
         })
       );
     }).then(() => {
-      console.log('Service Worker activado');
+  
       return self.clients.claim();
     })
   );
@@ -60,7 +60,7 @@ self.addEventListener('fetch', (event) => {
       caches.match(request)
         .then((response) => {
           return response || fetch(request).catch(() => {
-            console.log('Error fetching critical resource:', url.pathname);
+    
             return new Response('Resource not available', { status: 404 });
           });
         })
@@ -85,7 +85,7 @@ self.addEventListener('fetch', (event) => {
             }
             return response;
           }).catch((error) => {
-            console.log('Error fetching static resource:', url.pathname, error);
+    
             return new Response('Static resource not available', { status: 404 });
           });
         })
@@ -107,7 +107,7 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch((error) => {
-          console.log('Error fetching API:', url.pathname, error);
+  
           return caches.match(request).catch(() => {
             return new Response('API not available', { status: 503 });
           });
@@ -133,7 +133,7 @@ self.addEventListener('fetch', (event) => {
             }
             return response;
           }).catch((error) => {
-            console.log('Error fetching image:', url.pathname, error);
+    
             // Intentar servir placeholder si es una imagen
             return caches.match('/placeholder-logo.png').catch(() => {
               return new Response('Image not available', { status: 404 });
@@ -147,7 +147,7 @@ self.addEventListener('fetch', (event) => {
   // Estrategia de fallback para otras solicitudes
   event.respondWith(
     fetch(request).catch((error) => {
-      console.log('Error fetching resource:', url.pathname, error);
+      
       return new Response('Resource not available', { status: 404 });
     })
   );

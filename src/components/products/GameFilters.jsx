@@ -189,11 +189,6 @@ const GameFilters = ({
             {totalPages > 1 && (
               <p className="mb-0 text-muted small">
                 Página <span className="fw-bold text-primary-accessible">{currentPage || 1}</span> de <span className="fw-bold text-primary-accessible">{totalPages || 1}</span>
-                {totalPages > 10 && (
-                  <span className="ms-2 text-warning-accessible">
-                    ⚠️ Muchas páginas ({totalPages})
-                  </span>
-                )}
               </p>
             )}
           </div>

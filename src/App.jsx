@@ -68,7 +68,6 @@ function App() {
     { preloadCount: 4, timeout: 10000 }
   );
 
-  // Optimización: Memoizar cálculos costosos
   const gamesWithDiscount = useMemo(() => 
     games.map(game => ({
       ...game,
@@ -95,7 +94,6 @@ function App() {
   const offersPagination = usePagination(offersFiltered);
   const mustHavePagination = usePagination(mustHaveFiltered);
 
-  // Optimización: Memoizar filtros aplicados
   const applyFiltersToGames = useCallback((gamesToFilter) => {
     return gamesToFilter.filter(game => {
       let match = true;
@@ -120,7 +118,6 @@ function App() {
     applyFiltersToGames(mustHaveFiltered).length, [applyFiltersToGames, mustHaveFiltered]
   );
 
-  // Optimización: Memoizar conteos de página
   const pageCounts = useMemo(() => {
     const baseCounts = {
       filteredCount: filteredGames.length,
@@ -152,13 +149,11 @@ function App() {
     if (isCartOpen) closeCart();
   };
 
-  // Optimización: Memoizar rutas que no muestran filtros
   const showFilters = useMemo(() => 
     !['/login', '/perfil', '/admin', '/sobre-proyecto', '/contacto'].includes(location.pathname),
     [location.pathname]
   );
 
-  // Optimización: Consolidar funciones de carrito con notificaciones
   const addToCart = useCallback((item) => {
     originalAddToCart(item);
     toast.success(`${item.title} agregado al carrito`, {
@@ -200,7 +195,6 @@ function App() {
     });
   }, [originalClearCart]);
 
-  // Sincronizar splash screen con el estado real de carga
   useEffect(() => {
     
     if (loading || isInitialLoad) {
@@ -242,7 +236,6 @@ function App() {
     }
   }, [isInitialLoad, loading, games.length, error]);
 
-  // Callback para cuando la splash screen se complete manualmente
   const handleSplashComplete = useCallback(() => {
     setShowSplash(false);
   }, []);
@@ -258,9 +251,9 @@ function App() {
           loadingText={splashText}
         />
       )}
-      <AuthProvider>
-        <ProductProvider>
-          <FavoritesProvider>
+    <AuthProvider>
+      <ProductProvider>
+        <FavoritesProvider>
             <AppLayout cartCount={cartCount} toggleCart={toggleCart} toggleLogin={toggleLogin}>
               <MainRoutes
                 showSplash={showSplash}
@@ -269,53 +262,53 @@ function App() {
                 offersPagination={offersPagination}
                 mustHavePagination={mustHavePagination}
                 // Props para filtros
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                selectedPlatform={selectedPlatform}
-                setSelectedPlatform={setSelectedPlatform}
-                selectedGenre={selectedGenre}
-                setSelectedGenre={setSelectedGenre}
-                sortBy={sortBy}
-                setSortBy={setSortBy}
-                clearFilters={clearFilters}
-                hasActiveFilters={hasActiveFilters}
-                platforms={platforms}
-                genres={genres}
+                        searchTerm={searchTerm}
+                        setSearchTerm={setSearchTerm}
+                        selectedPlatform={selectedPlatform}
+                        setSelectedPlatform={setSelectedPlatform}
+                        selectedGenre={selectedGenre}
+                        setSelectedGenre={setSelectedGenre}
+                        sortBy={sortBy}
+                        setSortBy={setSortBy}
+                        clearFilters={clearFilters}
+                        hasActiveFilters={hasActiveFilters}
+                        platforms={platforms}
+                        genres={genres}
                 // Props para paginación
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-                totalPages={totalPages}
-                totalGames={totalGames}
-                currentPageGames={currentPageGames}
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                        totalPages={totalPages}
+                        totalGames={totalGames}
+                        currentPageGames={currentPageGames}
                 // Props para carrito
-                addToCart={addToCart}
-                removeFromCart={removeFromCart}
+                      addToCart={addToCart} 
+                      removeFromCart={removeFromCart}
                 updateQuantity={updateQuantity}
-                cartItems={cartItems}
+                      cartItems={cartItems}
                 // Props para estado de carga
-                loading={loading}
-                error={error}
-                usingMockData={usingMockData}
-                isInitialLoad={isInitialLoad}
+                      loading={loading}
+                      error={error}
+                      usingMockData={usingMockData}
+                      isInitialLoad={isInitialLoad}
                 refetchGames={refetchGames}
                 forceMockData={forceMockData}
-              />
+                    />
               <LoginManager isLoginOpen={isLoginOpen} closeLogin={() => setIsLoginOpen(false)} />
               <CartManager
                 cartShouldRender={cartShouldRender}
-                cartItems={cartItems}
-                removeFromCart={removeFromCart}
-                closeCart={closeCart}
-                updateQuantity={updateQuantity}
-                clearCart={clearCart}
-                isOpen={isCartOpen}
-                onExited={handleCartExited}
-                toggleLogin={toggleLogin}
-              />
+                    cartItems={cartItems}
+                  removeFromCart={removeFromCart}
+                  closeCart={closeCart}
+                  updateQuantity={updateQuantity}
+                  clearCart={clearCart}
+                  isOpen={isCartOpen}
+                  onExited={handleCartExited}
+                  toggleLogin={toggleLogin}
+                />
             </AppLayout>
-          </FavoritesProvider>
-        </ProductProvider>
-      </AuthProvider>
+        </FavoritesProvider>
+      </ProductProvider>
+    </AuthProvider>
     </>
   );
 }

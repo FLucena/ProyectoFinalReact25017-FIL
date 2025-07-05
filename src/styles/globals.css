@@ -60,6 +60,170 @@ body {
 
 .navbar-nav .nav-link {
   color: var(--bs-white) !important;
+  position: relative;
+  transition: all 0.3s ease;
+  text-decoration: none !important;
+  overflow: hidden;
+}
+
+/* Animación moderna para nav-links - Reemplaza el subrayado tradicional */
+.navbar-nav .nav-link::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #0d6efd, #0a58ca);
+  transform: translateX(-50%);
+  transition: width 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  border-radius: 1px;
+}
+
+.navbar-nav .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ffffff, #f8f9fa);
+  transform: translateX(-50%);
+  transition: width 0.3s ease 0.1s, opacity 0.3s ease 0.1s;
+  opacity: 0;
+  border-radius: 1px;
+}
+
+.navbar-nav .nav-link:hover::before {
+  width: 80%;
+  opacity: 1;
+}
+
+.navbar-nav .nav-link:hover::after {
+  width: 60%;
+  opacity: 0.7;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Efecto de brillo en hover */
+.navbar-nav .nav-link:hover .nav-link-icon {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+  transform: scale(1.1);
+}
+
+/* Animación para iconos en nav-links */
+.navbar-nav .nav-link svg,
+.navbar-nav .nav-link .nav-link-icon {
+  transition: all 0.3s ease;
+}
+
+/* Efecto de pulso sutil en hover */
+@keyframes navPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.navbar-nav .nav-link:hover {
+  animation: navPulse 0.6s ease;
+}
+
+/* Estilos para nav-links activos */
+.navbar-nav .nav-link.active::before,
+.navbar-nav .nav-link.active::after {
+  width: 100%;
+  opacity: 1;
+}
+
+.navbar-nav .nav-link.active {
+  color: #ffffff !important;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Animaciones para dropdown items */
+.dropdown-item {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdown-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(13, 110, 253, 0.1), rgba(10, 88, 202, 0.1));
+  transition: width 0.3s ease;
+}
+
+.dropdown-item:hover::before {
+  width: 100%;
+}
+
+.dropdown-item:hover {
+  transform: translateX(5px);
+  background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+/* Animación para botones del navbar */
+.navbar .btn {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.navbar .btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.navbar .btn:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+.navbar .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Animación para navbar-brand */
+.navbar-brand {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.navbar-brand:hover {
+  transform: scale(1.05);
+  text-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+}
+
+/* Efecto de brillo para iconos en hover */
+.navbar svg {
+  transition: all 0.3s ease;
+}
+
+.navbar .btn:hover svg,
+.navbar-brand:hover svg {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+  transform: scale(1.1);
 }
 
 /* Estilos de botones */

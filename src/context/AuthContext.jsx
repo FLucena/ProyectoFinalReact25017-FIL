@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 
 const AuthContext = createContext();
 
-// Optimización: Constantes para credenciales de prueba
 const TEST_CREDENTIALS = {
   admin: { email: 'admin@test.com', password: 'admin123', name: 'Administrador', role: 'admin', id: 1 },
   user: { email: 'user@test.com', password: 'user123', name: 'Usuario', role: 'user', id: 2 }
@@ -13,7 +12,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Optimización: Función unificada para guardar en localStorage
   const saveToStorage = useCallback((userData, authStatus) => {
     try {
       localStorage.setItem('user', JSON.stringify(userData));
@@ -23,7 +21,6 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // Optimización: Función unificada para limpiar localStorage
   const clearStorage = useCallback(() => {
     try {
       localStorage.removeItem('user');
@@ -33,7 +30,6 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // Cargar estado de autenticación desde localStorage al iniciar
   useEffect(() => {
     try {
       const savedUser = localStorage.getItem('user');
@@ -52,14 +48,12 @@ export function AuthProvider({ children }) {
     }
   }, [clearStorage]);
 
-  // Optimización: Función unificada para validar credenciales
   const validateCredentials = useCallback((email, password) => {
     const credentials = Object.values(TEST_CREDENTIALS);
     return credentials.find(cred => cred.email === email && cred.password === password);
   }, []);
 
   const login = useCallback((email, password) => {
-    // Validaciones básicas
     if (!email || !password) {
       return { success: false, message: 'Email y contraseña son requeridos' };
     }
@@ -68,7 +62,6 @@ export function AuthProvider({ children }) {
       return { success: false, message: 'Email inválido' };
     }
 
-    // Validación de credenciales
     const validCredential = validateCredentials(email, password);
     
     if (validCredential) {
@@ -96,7 +89,6 @@ export function AuthProvider({ children }) {
   }, [clearStorage]);
 
   const register = useCallback((email, password, confirmPassword) => {
-    // Validaciones
     if (!email || !password || !confirmPassword) {
       return { success: false, message: 'Todos los campos son requeridos' };
     }
@@ -113,13 +105,11 @@ export function AuthProvider({ children }) {
       return { success: false, message: 'La contraseña debe tener al menos 6 caracteres' };
     }
 
-    // Verificar si el email ya existe
     const existingUser = Object.values(TEST_CREDENTIALS).find(cred => cred.email === email);
     if (existingUser) {
       return { success: false, message: 'El email ya está registrado' };
     }
 
-    // Simulación de registro exitoso
     const userData = { 
       email, 
       name: email.split('@')[0],
@@ -134,7 +124,6 @@ export function AuthProvider({ children }) {
     return { success: true, message: 'Registro exitoso' };
   }, [saveToStorage]);
 
-  // Optimización: Memoizar valores del contexto
   const contextValue = {
     isAuthenticated,
     user,

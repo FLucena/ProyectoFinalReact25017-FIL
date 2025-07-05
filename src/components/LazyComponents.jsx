@@ -70,15 +70,24 @@ export const LazyProductDetail = () => (
   </LazyRouteLoader>
 );
 
-export const LazyCart = () => (
+export const LazyCart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOpen, onExited, toggleLogin }) => (
   <LazyRouteLoader>
-    <Cart />
+    <Cart 
+      cart={cart}
+      removeFromCart={removeFromCart}
+      closeCart={closeCart}
+      updateQuantity={updateQuantity}
+      clearCart={clearCart}
+      isOpen={isOpen}
+      onExited={onExited}
+      toggleLogin={toggleLogin}
+    />
   </LazyRouteLoader>
 );
 
-export const LazyLogin = () => (
+export const LazyLogin = ({ closeLogin }) => (
   <LazyRouteLoader>
-    <Login />
+    <Login closeLogin={closeLogin} />
   </LazyRouteLoader>
 );
 

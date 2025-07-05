@@ -3,7 +3,6 @@
 import { Link, useNavigate } from "react-router-dom"
 import { FaShoppingCart, FaUser, FaSignOutAlt, FaCog, FaCrown, FaHome, FaTags, FaStar, FaBars, FaGraduationCap } from "react-icons/fa"
 import { useAuth } from '../../context/AuthContext';
-import { useState } from "react"
 import { Dropdown } from "react-bootstrap"
 
 const Header = ({ cartCount, toggleCart, toggleLogin }) => {

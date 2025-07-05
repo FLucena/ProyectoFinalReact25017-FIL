@@ -66,7 +66,6 @@ export function ProductProvider({ children }) {
     }
   }, [products]);
 
-  // Optimización: Función unificada para manejo de errores
   const handleError = useCallback((error, defaultMessage) => {
     const errorMessage = error?.message || defaultMessage;
     setError(errorMessage);
@@ -74,7 +73,6 @@ export function ProductProvider({ children }) {
     console.error('Product operation error:', error);
   }, []);
 
-  // Optimización: Función unificada para operaciones exitosas
   const handleSuccess = useCallback((message) => {
     toast.success(message);
     setError(null);

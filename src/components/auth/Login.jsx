@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { X, Eye, EyeOff } from "lucide-react"
 import { FaTimes, FaEye, FaEyeSlash, FaUser, FaLock, FaEnvelope, FaSignInAlt, FaUserPlus } from "react-icons/fa"
 import { useAuth } from '../../context/AuthContext';
@@ -19,6 +19,22 @@ const Login = ({ closeLogin }) => {
   const { login, register } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        closeLogin()
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape)
+    document.body.style.overflow = 'hidden'
+    
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'unset'
+    }
+  }, [closeLogin])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -70,12 +86,39 @@ const Login = ({ closeLogin }) => {
     <div
       className="position-fixed top-0 end-0 bottom-0 start-0 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center"
       style={{ zIndex: 1050 }}
+      onClick={closeLogin}
     >
-      <div className="bg-white rounded shadow-lg p-4" style={{ width: "100%", maxWidth: "400px" }}>
+      <div 
+        className="bg-white rounded shadow-lg p-4" 
+        style={{ width: "100%", maxWidth: "400px" }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="fs-4 fw-bold m-0">{isRegister ? "Crear Cuenta" : "Iniciar Sesión"}</h2>
-          <button onClick={closeLogin} className="btn btn-sm btn-outline-secondary rounded-circle">
-            <FaTimes size={20} />
+          <button 
+            onClick={closeLogin} 
+            className="btn btn-sm p-0"
+            aria-label="Cerrar modal de login"
+            style={{ 
+              width: '36px', 
+              height: '36px', 
+              borderRadius: '50%',
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              border: '1px solid #ced4da',
+              background: 'transparent',
+              transition: 'background 0.2s, border-color 0.2s',
+              position: 'relative',
+              outline: 'none',
+              cursor: 'pointer',
+            }}
+            onMouseOver={e => e.currentTarget.style.background = '#f1f3f5'}
+            onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+            onFocus={e => e.currentTarget.style.background = '#f1f3f5'}
+            onBlur={e => e.currentTarget.style.background = 'transparent'}
+          >
+            <FaTimes size={18} style={{ color: '#495057' }} />
           </button>
         </div>
 

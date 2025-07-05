@@ -13,7 +13,6 @@ import GameFilters from '../products/GameFilters';
 import ProtectedRoute from '../auth/ProtectedRoute';
 
 const MainRoutes = (props) => {
-  // Determinar si mostrar filtros basado en la ruta actual
   const showFilters = !['/login', '/perfil', '/admin', '/sobre-proyecto', '/contacto', '/payment/success', '/payment/failure'].includes(window.location.pathname);
 
   return (

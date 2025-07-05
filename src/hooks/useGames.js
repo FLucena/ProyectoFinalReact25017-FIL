@@ -60,7 +60,6 @@ export const useGames = () => {
   const [usingMockData, setUsingMockData] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // Validación de datos de juegos
   const validateGameData = useCallback((data) => {
     if (!Array.isArray(data)) {
       throw new Error("Formato de respuesta inválido: se esperaba un array");
@@ -81,7 +80,6 @@ export const useGames = () => {
     });
   }, []);
 
-  // Fetch con timeout y manejo de errores mejorado
   const fetchWithTimeout = useCallback(async (url, timeout = 3000) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -109,7 +107,6 @@ export const useGames = () => {
     }
   }, [validateGameData]);
 
-  // Lista de proxies CORS para intentar (ordenados por confiabilidad)
   const proxies = [
     "https://cors.bridged.cc/",
     "https://api.allorigins.win/raw?url=",
@@ -126,7 +123,6 @@ export const useGames = () => {
       const proxy = proxies[i];
       let url;
       
-      // Construir URL según el formato del proxy
       if (proxy.includes('allorigins.win')) {
         url = `${proxy}${encodeURIComponent(targetUrl)}`;
       } else if (proxy.includes('codetabs.com')) {
@@ -136,33 +132,24 @@ export const useGames = () => {
       }
       
       try {
-        const data = await fetchWithTimeout(url, 5000); // Timeout más corto por proxy
+        const data = await fetchWithTimeout(url, 5000);
         if (data && data.length > 0) {
-          console.log(`✅ Proxy exitoso: ${proxy}`);
           return data;
         }
         throw new Error("El proxy no devolvió datos válidos");
       } catch (err) {
-        console.log(`❌ Proxy falló: ${proxy} - ${err.message}`);
-        // Continuar con el siguiente proxy
         continue;
       }
     }
     
-    // Si llegamos aquí, todos los proxies fallaron
-    console.log("❌ Todos los proxies CORS fallaron");
     throw new Error("Todos los proxies CORS fallaron");
   }, [fetchWithTimeout]);
 
-  // Carga completa de datos en segundo plano
   const loadFullData = useCallback(async () => {
     setLoading(true);
     setIsInitialLoad(true);
     
-    // Detectar si estamos en desarrollo o producción
     const isDevelopment = process.env.NODE_ENV === 'development';
-    
-    // Temporalmente forzar intento de API real incluso en desarrollo para testing
     const forceApiAttempt = true;
     
     if (isDevelopment && !forceApiAttempt) {
@@ -180,7 +167,6 @@ export const useGames = () => {
       return;
     }
     
-    // En producción, intentar API real con timeout más largo para dar tiempo a reintentos
     const apiTimeout = setTimeout(async () => {
       try {
         const mockResponse = await fetchMockGames(500);
@@ -188,13 +174,12 @@ export const useGames = () => {
         setUsingMockData(true);
         setError("⚠️ Usando datos de demostración - API no disponible después de múltiples intentos");
       } catch (mockErr) {
-        console.error("Error al cargar datos mock:", mockErr);
         setError("❌ Error al cargar datos de demostración");
       } finally {
         setLoading(false);
         setIsInitialLoad(false);
       }
-    }, 25000); // 25 segundos de timeout para dar tiempo a reintentos
+    }, 25000);
     
     try {
       const data = await attemptFetchFromProxies();
@@ -203,17 +188,14 @@ export const useGames = () => {
       setUsingMockData(false);
       setError(null);
     } catch (err) {
-      console.warn("Todos los proxies fallaron después de múltiples intentos, usando datos mock:", err.message);
       clearTimeout(apiTimeout);
       
-      // Fallback a datos mock después de agotar todos los intentos
       try {
         const mockResponse = await fetchMockGames(500);
         setGames(mockResponse.data);
         setUsingMockData(true);
         setError("⚠️ Usando datos de demostración - API FreeToGame no disponible después de múltiples intentos");
       } catch (mockErr) {
-        console.error("Error al cargar datos mock:", mockErr);
         setError("❌ Error al cargar datos de demostración");
       }
     } finally {
@@ -223,16 +205,13 @@ export const useGames = () => {
   }, [attemptFetchFromProxies]);
 
   useEffect(() => {
-    // Cargar datos reales inmediatamente al montar
     loadFullData();
   }, [loadFullData]);
 
-  // Función para recargar datos manualmente
   const refetchGames = useCallback(() => {
     loadFullData();
   }, [loadFullData]);
 
-  // Función para forzar uso de datos mock (útil para testing)
   const forceMockData = useCallback(() => {
     setGames(INSTANT_MOCK);
   }, []);

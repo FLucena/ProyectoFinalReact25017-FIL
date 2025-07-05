@@ -85,6 +85,23 @@ const ActionButton = styled.button`
   }
 `
 
+const QuantityDisplay = styled.span`
+  margin-left: 10px;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border: 1px solid #dee2e6;
+  border-radius: 0.6rem;
+  background: #fff;
+  color: #495057;
+  user-select: none;
+`;
+
 const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuantity, isLCP = false }) => {
   const { title, thumbnail, genre, platform, publisher, release_date, discount, rating } = product
   const [quantity, setQuantity] = useState(0)
@@ -339,9 +356,9 @@ const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuan
                 >
                   {quantity === 1 ? <FaTrash size={14} aria-hidden="true" /> : <FaMinus size={14} aria-hidden="true" />}
                 </Button>
-                <span className="btn btn-outline-secondary disabled" aria-label={`Cantidad: ${quantity}`}>
+                <QuantityDisplay aria-label={`Cantidad: ${quantity}`}>
                   {quantity}
-                </span>
+                </QuantityDisplay>
                 <Button 
                   variant="outline-danger" 
                   onClick={(e) => handleQuantityChange(e, quantity + 1)}

@@ -17,8 +17,9 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
   const { isAuthenticated } = useAuth();
 
   // Calcula el total y cantidad de items para mostrar en el header
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const safeCart = cart || [];
+  const total = safeCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const itemCount = safeCart.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleDeleteClick = (item) => {
     setItemToDelete(item);
@@ -38,17 +39,21 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
     setShowClearModal(false);
   };
 
+  const handleCloseCart = () => {
+    closeCart();
+  };
+
   // Renderiza pantalla de acceso restringido si no está autenticado
   if (!isAuthenticated) {
     return (
       <Offcanvas 
         show={isOpen} 
-        onHide={closeCart} 
+        onHide={handleCloseCart} 
         placement="end" 
         backdropClassName="bg-dark bg-opacity-50"
         aria-labelledby="cart-title"
       >
-        <Offcanvas.Header closeButton>
+        <Offcanvas.Header closeButton onHide={handleCloseCart}>
           <Offcanvas.Title id="cart-title">
             <FaShoppingCart size={20} className="me-2" />
             Carrito de Compras
@@ -64,7 +69,7 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
             <Button 
               variant="danger" 
               onClick={() => {
-                closeCart();
+                handleCloseCart();
                 toggleLogin();
               }}
               className="me-2"
@@ -74,7 +79,7 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
             </Button>
             <Button 
               variant="outline-secondary" 
-              onClick={closeCart}
+              onClick={handleCloseCart}
               aria-label="Cerrar carrito y continuar comprando"
             >
               Continuar Comprando
@@ -89,13 +94,13 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
     <>
       <Offcanvas 
         show={isOpen} 
-        onHide={closeCart} 
+        onHide={handleCloseCart} 
         placement="end" 
         backdropClassName="bg-dark bg-opacity-50"
         onExited={onExited}
         aria-labelledby="cart-title"
       >
-        <Offcanvas.Header closeButton>
+        <Offcanvas.Header closeButton onHide={handleCloseCart}>
           <Offcanvas.Title id="cart-title">
             <FaShoppingCart size={20} className="me-2" />
             Carrito de Compras
@@ -106,7 +111,7 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
         </Offcanvas.Header>
         <Offcanvas.Body className="d-flex flex-column">
           {/* Botón para vaciar carrito - solo visible si hay items */}
-          {cart.length > 0 && (
+          {safeCart.length > 0 && (
             <div className="p-2 border-bottom text-end">
               <Button 
                 variant="outline-danger" 
@@ -120,14 +125,14 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
           )}
           
           <div className="flex-grow-1">
-            {cart.length === 0 ? (
+            {safeCart.length === 0 ? (
               // Estado vacío del carrito
               <div className="p-4 text-center">
                 <FaShoppingCart size={48} className="text-muted mb-3" aria-hidden="true" />
                 <p className="text-secondary mb-3">Tu carrito está vacío</p>
                 <Button 
-                  variant="danger" 
-                  onClick={closeCart}
+                  variant="outline-secondary" 
+                  onClick={handleCloseCart}
                   aria-label="Cerrar carrito y continuar comprando"
                 >
                   Continuar Comprando
@@ -136,7 +141,7 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
             ) : (
               // Lista de productos en el carrito
               <div className="border-bottom">
-                {cart.map((item) => (
+                {safeCart.map((item) => (
                   <div key={item.id} className="p-3 border-bottom">
                     <div className="d-flex">
                       <div className="flex-shrink-0 me-3" style={{ width: "80px", height: "80px" }}>
@@ -164,7 +169,6 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
                         </h5>
                         <div className="d-flex justify-content-between align-items-center mb-2">
                           <p className="text-primary fw-bold mb-0">${item.price.toFixed(2)}</p>
-                          <p className="text-muted mb-0">Cantidad: {item.quantity}</p>
                         </div>
                         <p className="text-primary fw-bold mb-2">
                           Subtotal: ${(item.price * item.quantity).toFixed(2)}
@@ -216,7 +220,7 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
           </div>
           
           {/* Resumen y botón de pago - solo visible si hay items */}
-          {cart.length > 0 && (
+          {safeCart.length > 0 && (
             <div className="p-3 border-top bg-white">
               <div className="d-flex justify-content-between mb-3">
                 <span className="fw-bold">Total ({itemCount} {itemCount === 1 ? 'artículo' : 'artículos'}):</span>
@@ -302,12 +306,12 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
       <Checkout
         show={showCheckout}
         onHide={() => setShowCheckout(false)}
-        cartItems={cart}
+        cartItems={safeCart}
         total={total}
         onPaymentSuccess={() => {
           clearCart();
           setShowCheckout(false);
-          closeCart();
+          handleCloseCart();
         }}
         onPaymentFailure={() => {
           setShowCheckout(false);
