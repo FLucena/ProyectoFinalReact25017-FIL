@@ -7,8 +7,8 @@ export const useGameDetail = (gameId) => {
 
   useEffect(() => {
     const fetchGameDetail = async () => {
-      const MAX_RETRIES = 3;
-      const TIMEOUT_MS = 15000;
+      const MAX_RETRIES = 5;
+      const TIMEOUT_MS = 25000;
       let retryCount = 0;
 
       const validateGameData = (data) => {

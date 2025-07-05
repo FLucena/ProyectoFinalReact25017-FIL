@@ -109,51 +109,91 @@ export const useGames = () => {
     }
   }, [validateGameData]);
 
-  // Proxies CORS más confiables y actualizados
+  // Proxies CORS más confiables y actualizados con reintentos
   const attemptFetchFromProxies = useCallback(async () => {
     const proxies = [
       "https://api.allorigins.win/raw?url=",
-      "https://thingproxy.freeboard.io/fetch/",
       "https://corsproxy.io/?",
-      "https://api.codetabs.com/v1/proxy?quest="
+      "https://api.codetabs.com/v1/proxy?quest=",
+      "https://cors-anywhere.herokuapp.com/",
+      "https://cors.bridged.cc/",
+      "https://proxy.cors.sh/",
+      "https://corsproxy.io/?",
+      "https://api.allorigins.win/raw?url=",
+      "https://thingproxy.freeboard.io/fetch/"
     ];
     
     const targetUrl = "https://www.freetogame.com/api/games";
+    const maxRetries = 2; // Reintentar cada proxy hasta 2 veces
     
-    for (const proxy of proxies) {
-      try {
-        let url;
-        
-        if (proxy.includes("corsproxy.io")) {
-          url = `${proxy}${targetUrl}`;
-        } else if (proxy.includes("codetabs.com")) {
-          url = `${proxy}${targetUrl}`;
-        } else {
-          url = `${proxy}${encodeURIComponent(targetUrl)}`;
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      for (const proxy of proxies) {
+        try {
+          let url;
+          
+          if (proxy.includes("corsproxy.io")) {
+            url = `${proxy}${targetUrl}`;
+          } else if (proxy.includes("codetabs.com")) {
+            url = `${proxy}${targetUrl}`;
+          } else if (proxy.includes("cors-anywhere")) {
+            url = `${proxy}${targetUrl}`;
+          } else if (proxy.includes("bridged.cc")) {
+            url = `${proxy}${targetUrl}`;
+          } else if (proxy.includes("proxy.cors.sh")) {
+            url = `${proxy}${targetUrl}`;
+          } else {
+            url = `${proxy}${encodeURIComponent(targetUrl)}`;
+          }
+          
+          console.log(`Intentando proxy: ${proxy} (intento ${attempt + 1}/${maxRetries})`);
+          const data = await fetchWithTimeout(url, 8000); // Aumentar timeout
+          
+          if (data && data.length > 0) {
+            console.log(`Proxy exitoso: ${proxy}`);
+            return data;
+          }
+        } catch (err) {
+          console.warn(`Proxy falló: ${proxy} (intento ${attempt + 1}/${maxRetries})`, err.message);
+          
+          // Si es un error de CSP o 404, no reintentar este proxy
+          if (err.message.includes('CSP') || err.message.includes('404') || err.message.includes('Failed to fetch')) {
+            console.log(`Proxy ${proxy} no disponible, saltando...`);
+            continue;
+          }
+          
+          // Si es el último intento para este proxy, continuar al siguiente
+          if (attempt === maxRetries - 1) {
+            continue;
+          }
+          
+          // Esperar un poco antes del siguiente intento
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
-        
-        const data = await fetchWithTimeout(url, 3000);
-        
-        if (data && data.length > 0) {
-          return data;
-        }
-      } catch (err) {
-        console.warn(`Proxy falló: ${proxy}`, err.message);
-        continue;
+      }
+      
+      // Si llegamos aquí, todos los proxies fallaron en este intento
+      if (attempt < maxRetries - 1) {
+        console.log(`Todos los proxies fallaron en el intento ${attempt + 1}, reintentando...`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
     }
     
-    throw new Error("Todos los proxies CORS fallaron");
+    throw new Error("Todos los proxies CORS fallaron después de múltiples intentos");
   }, [fetchWithTimeout]);
 
   // Carga completa de datos en segundo plano
   const loadFullData = useCallback(async () => {
+    console.log("🔄 Iniciando carga de datos...");
     setLoading(true);
     setIsInitialLoad(true);
     
-    // Temporalmente forzar modo producción para probar API real
-    const isDevelopment = false;
-    if (isDevelopment) {
+    // Detectar si estamos en desarrollo o producción
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    // Temporalmente forzar intento de API real incluso en desarrollo para testing
+    const forceApiAttempt = true;
+    
+    if (isDevelopment && !forceApiAttempt) {
       try {
         const mockResponse = await fetchMockGames(800);
         setGames(mockResponse.data);
@@ -168,20 +208,41 @@ export const useGames = () => {
       return;
     }
     
+    // En producción, intentar API real con timeout más largo para dar tiempo a reintentos
+    const apiTimeout = setTimeout(async () => {
+      console.log("Timeout de API alcanzado después de múltiples intentos, usando datos mock");
+      try {
+        const mockResponse = await fetchMockGames(500);
+        setGames(mockResponse.data);
+        setUsingMockData(true);
+        setError("⚠️ Usando datos de demostración - API no disponible después de múltiples intentos");
+      } catch (mockErr) {
+        console.error("Error al cargar datos mock:", mockErr);
+        setError("❌ Error al cargar datos de demostración");
+      } finally {
+        setLoading(false);
+        setIsInitialLoad(false);
+      }
+    }, 25000); // 25 segundos de timeout para dar tiempo a reintentos
+    
     try {
+      console.log("🌐 Intentando obtener datos de la API real...");
       const data = await attemptFetchFromProxies();
+      clearTimeout(apiTimeout);
+      console.log("✅ Datos de API obtenidos exitosamente:", data.length, "juegos");
       setGames(data);
       setUsingMockData(false);
       setError(null);
     } catch (err) {
-      console.warn("API no disponible, usando datos mock:", err.message);
+      console.warn("Todos los proxies fallaron después de múltiples intentos, usando datos mock:", err.message);
+      clearTimeout(apiTimeout);
       
-      // Fallback a datos mock en producción también
+      // Fallback a datos mock después de agotar todos los intentos
       try {
-        const mockResponse = await fetchMockGames(1000);
+        const mockResponse = await fetchMockGames(500);
         setGames(mockResponse.data);
         setUsingMockData(true);
-        setError("⚠️ Usando datos de demostración - API FreeToGame no disponible");
+        setError("⚠️ Usando datos de demostración - API FreeToGame no disponible después de múltiples intentos");
       } catch (mockErr) {
         console.error("Error al cargar datos mock:", mockErr);
         setError("❌ Error al cargar datos de demostración");
