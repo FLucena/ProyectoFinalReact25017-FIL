@@ -54,6 +54,7 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
               className="navbar-brand d-flex align-items-center flex-grow-1" 
               to="/"
               aria-label="Ir a la página de inicio"
+              style={{ textDecoration: "none" }}
             >
               <FaHome className="me-2" aria-hidden="true" />
               <span className="d-none d-sm-inline">Mi Nuevo Vicio</span>
@@ -118,6 +119,7 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
                       to="/perfil"
                       role="menuitem"
                       aria-label="Ir a mi perfil"
+                      style={{ color: "#212529", opacity: 1, pointerEvents: "auto", textDecoration: "none" }}
                     >
                       <FaUser size={16} className="me-2" aria-hidden="true" />
                       Mi Perfil
@@ -128,6 +130,7 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
                         to="/admin"
                         role="menuitem"
                         aria-label="Ir al panel de administración"
+                        style={{ color: "#212529", opacity: 1, pointerEvents: "auto", textDecoration: "none" }}
                       >
                         <FaCog size={16} className="me-2" aria-hidden="true" />
                         Panel Admin
@@ -139,6 +142,7 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
                       className="text-danger"
                       role="menuitem"
                       aria-label="Cerrar sesión"
+                      style={{ color: "#212529", opacity: 1, pointerEvents: "auto", textDecoration: "none" }}
                     >
                       <FaSignOutAlt size={16} className="me-2" aria-hidden="true" />
                       Cerrar Sesión
@@ -278,6 +282,7 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
                         to="/perfil"
                         role="menuitem"
                         aria-label="Ir a mi perfil"
+                        style={{ color: "#212529", opacity: 1, pointerEvents: "auto", textDecoration: "none" }}
                       >
                         <FaUser size={16} className="me-2" aria-hidden="true" />
                         Mi Perfil
@@ -288,6 +293,7 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
                           to="/admin"
                           role="menuitem"
                           aria-label="Ir al panel de administración"
+                          style={{ color: "#212529", opacity: 1, pointerEvents: "auto", textDecoration: "none" }}
                         >
                           <FaCog size={16} className="me-2" aria-hidden="true" />
                           Panel Admin
@@ -299,6 +305,7 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
                         className="text-danger"
                         role="menuitem"
                         aria-label="Cerrar sesión"
+                        style={{ color: "#212529", opacity: 1, pointerEvents: "auto", textDecoration: "none" }}
                       >
                         <FaSignOutAlt size={16} className="me-2" aria-hidden="true" />
                         Cerrar Sesión
