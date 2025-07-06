@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { buildFreeToGameUrl } from '../config/api';
 
 export const useGameDetail = (gameId) => {
   const [game, setGame] = useState(null);
@@ -68,9 +69,17 @@ export const useGameDetail = (gameId) => {
       const attemptFetch = async () => {
         try {
           setLoading(true);
-          const proxyUrl = "https://api.allorigins.win/raw?url=";
-          const targetUrl = `https://www.freetogame.com/api/game?id=${gameId}`;
-          const url = `${proxyUrl}${encodeURIComponent(targetUrl)}`;
+          
+          const isDevelopment = process.env.NODE_ENV === 'development';
+          let url;
+          
+          if (isDevelopment) {
+            // En desarrollo, intentar directamente con la API
+            url = `https://www.freetogame.com/api/game?id=${gameId}`;
+          } else {
+            // En producción, usar nuestro proxy serverless
+            url = buildFreeToGameUrl('', { id: gameId });
+          }
           
           const data = await fetchWithTimeout(url, TIMEOUT_MS);
           setGame(data);
@@ -92,32 +101,26 @@ export const useGameDetail = (gameId) => {
             return;
           } catch (err) {
             retryCount++;
-            console.error(`Fetch attempt ${retryCount} failed:`, err.message);
+            console.warn(`Intento ${retryCount} falló:`, err.message);
             
-            if (retryCount === MAX_RETRIES) {
-              const errorMessage = err.message === "La solicitud ha excedido el tiempo de espera"
-                ? "La solicitud tardó demasiado en completarse. Por favor, inténtalo de nuevo más tarde."
-                : `Error al cargar los detalles del juego después de ${MAX_RETRIES} intentos. Pruebe nuevamente en unos minutos.`;
-              
-              setError(errorMessage);
-              console.error("Todos los intentos fallaron:", errorMessage);
-            } else {
-              const delay = Math.min(1000 * Math.pow(2, retryCount - 1), 10000);
-              await new Promise(resolve => setTimeout(resolve, delay));
+            if (retryCount >= MAX_RETRIES) {
+              setError(`Error al cargar detalles del juego después de ${MAX_RETRIES} intentos: ${err.message}`);
+              setLoading(false);
+              return;
             }
+            
+            // Esperar antes del siguiente intento (backoff exponencial)
+            await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
           }
         }
       };
 
-      if (gameId) {
-        retryFetch();
-      } else {
-        setLoading(false);
-        setError("ID de juego no proporcionado");
-      }
+      retryFetch();
     };
 
-    fetchGameDetail();
+    if (gameId) {
+      fetchGameDetail();
+    }
   }, [gameId]);
 
   return { game, loading, error };

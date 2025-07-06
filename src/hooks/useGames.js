@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchMockGames } from '../data/mockData';
+import { buildFreeToGameUrl } from '../config/api';
 
 // Productos mock instantáneos para el primer render
 const INSTANT_MOCK = [
@@ -90,8 +91,7 @@ export const useGames = () => {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
-        },
-        mode: 'cors'
+        }
       });
       clearTimeout(timeoutId);
       
@@ -107,42 +107,34 @@ export const useGames = () => {
     }
   }, [validateGameData]);
 
-  const proxies = [
-    "https://cors.bridged.cc/",
-    "https://api.allorigins.win/raw?url=",
-    "https://thingproxy.freeboard.io/fetch/",
-    "https://corsproxy.io/?",
-    "https://api.codetabs.com/v1/proxy?quest=",
-    "https://cors.io/?"
-  ];
-
-  const attemptFetchFromProxies = useCallback(async () => {
-    const targetUrl = "https://www.freetogame.com/api/games";
+  const attemptFetchFromAPI = useCallback(async () => {
+    const isDevelopment = process.env.NODE_ENV === 'development';
     
-    for (let i = 0; i < proxies.length; i++) {
-      const proxy = proxies[i];
-      let url;
-      
-      if (proxy.includes('allorigins.win')) {
-        url = `${proxy}${encodeURIComponent(targetUrl)}`;
-      } else if (proxy.includes('codetabs.com')) {
-        url = `${proxy}${targetUrl}`;
-      } else {
-        url = `${proxy}${targetUrl}`;
-      }
-      
+    if (isDevelopment) {
+      // En desarrollo, intentar directamente con la API
+      const url = 'https://www.freetogame.com/api/games';
       try {
         const data = await fetchWithTimeout(url, 5000);
         if (data && data.length > 0) {
           return data;
         }
+        throw new Error("La API no devolvió datos válidos");
+      } catch (err) {
+        throw new Error("Error al conectar con la API en desarrollo");
+      }
+    } else {
+      // En producción, usar nuestro proxy serverless
+      const url = buildFreeToGameUrl('', {});
+      try {
+        const data = await fetchWithTimeout(url, 10000);
+        if (data && data.length > 0) {
+          return data;
+        }
         throw new Error("El proxy no devolvió datos válidos");
       } catch (err) {
-        continue;
+        throw new Error("Error al conectar con el proxy serverless");
       }
     }
-    
-    throw new Error("Todos los proxies CORS fallaron");
   }, [fetchWithTimeout]);
 
   const loadFullData = useCallback(async () => {
@@ -182,7 +174,7 @@ export const useGames = () => {
     }, 25000);
     
     try {
-      const data = await attemptFetchFromProxies();
+      const data = await attemptFetchFromAPI();
       clearTimeout(apiTimeout);
       setGames(data);
       setUsingMockData(false);
@@ -202,25 +194,49 @@ export const useGames = () => {
       setLoading(false);
       setIsInitialLoad(false);
     }
-  }, [attemptFetchFromProxies]);
+  }, [attemptFetchFromAPI]);
 
   useEffect(() => {
     loadFullData();
   }, [loadFullData]);
 
-  const refetchGames = useCallback(() => {
-    loadFullData();
-  }, [loadFullData]);
+  const refetchGames = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const data = await attemptFetchFromAPI();
+      setGames(data);
+      setUsingMockData(false);
+      setError(null);
+    } catch (err) {
+      setError("❌ Error al recargar datos de la API");
+    } finally {
+      setLoading(false);
+    }
+  }, [attemptFetchFromAPI]);
 
-  const forceMockData = useCallback(() => {
-    setGames(INSTANT_MOCK);
+  const forceMockData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const mockResponse = await fetchMockGames(500);
+      setGames(mockResponse.data);
+      setUsingMockData(true);
+      setError("🛠️ Usando datos de demostración por solicitud del usuario");
+    } catch (mockErr) {
+      setError("❌ Error al cargar datos de demostración");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { 
-    games, 
-    loading, 
-    error, 
-    usingMockData, 
+  return {
+    games,
+    loading,
+    error,
+    usingMockData,
     isInitialLoad,
     refetchGames,
     forceMockData
