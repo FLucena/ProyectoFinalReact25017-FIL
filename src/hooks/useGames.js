@@ -2,58 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { fetchMockGames } from '../data/mockData';
 import { buildFreeToGameUrl } from '../config/api';
 
-// Productos mock instantáneos para el primer render
-const INSTANT_MOCK = [
-  {
-    id: 1,
-    title: 'Mock Game 1',
-    thumbnail: '/placeholder-logo.png',
-    genre: 'Acción',
-    platform: 'PC',
-    publisher: 'Demo Publisher',
-    release_date: '2023-01-01',
-    price: 0,
-    discount: 0,
-    rating: 4.5
-  },
-  {
-    id: 2,
-    title: 'Mock Game 2',
-    thumbnail: '/placeholder-logo.png',
-    genre: 'Aventura',
-    platform: 'PC',
-    publisher: 'Demo Publisher',
-    release_date: '2023-01-02',
-    price: 0,
-    discount: 0,
-    rating: 4.6
-  },
-  {
-    id: 3,
-    title: 'Mock Game 3',
-    thumbnail: '/placeholder-logo.png',
-    genre: 'Estrategia',
-    platform: 'PC',
-    publisher: 'Demo Publisher',
-    release_date: '2023-01-03',
-    price: 0,
-    discount: 0,
-    rating: 4.7
-  },
-  {
-    id: 4,
-    title: 'Mock Game 4',
-    thumbnail: '/placeholder-logo.png',
-    genre: 'RPG',
-    platform: 'PC',
-    publisher: 'Demo Publisher',
-    release_date: '2023-01-04',
-    price: 0,
-    discount: 0,
-    rating: 4.8
-  }
-];
-
 export const useGames = () => {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);

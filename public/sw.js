@@ -1,7 +1,7 @@
 const CACHE_NAME = 'mi-nuevo-vicio-v1';
 const CRITICAL_RESOURCES = [
   '/',
-  '/placeholder-logo.svg'
+  '/game-placeholder.webp'
 ];
 
 const STATIC_CACHE = [
@@ -60,7 +60,7 @@ self.addEventListener('fetch', (event) => {
         .then((response) => {
           return response || fetch(request).catch(() => {
     
-            return new Response('Resource not available', { status: 404 });
+            return new Response('Recurso no disponible', { status: 404 });
           });
         })
     );
@@ -85,7 +85,7 @@ self.addEventListener('fetch', (event) => {
             return response;
           }).catch((error) => {
     
-            return new Response('Static resource not available', { status: 404 });
+            return new Response('Recurso estático no disponible', { status: 404 });
           });
         })
     );
@@ -108,7 +108,7 @@ self.addEventListener('fetch', (event) => {
         .catch((error) => {
   
           return caches.match(request).catch(() => {
-            return new Response('API not available', { status: 503 });
+            return new Response('API no disponible', { status: 503 });
           });
         })
     );
@@ -134,8 +134,8 @@ self.addEventListener('fetch', (event) => {
           }).catch((error) => {
     
             // Intentar servir placeholder si es una imagen
-            return caches.match('/placeholder-logo.svg').catch(() => {
-              return new Response('Image not available', { status: 404 });
+            return caches.match('/placeholder.svg').catch(() => {
+              return new Response('Imagen no disponible', { status: 404 });
             });
           });
         })
@@ -147,7 +147,7 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(request).catch((error) => {
       
-      return new Response('Resource not available', { status: 404 });
+      return new Response('Recurso no disponible', { status: 404 });
     })
   );
 }); 

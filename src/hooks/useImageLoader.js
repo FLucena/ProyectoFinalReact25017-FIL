@@ -109,7 +109,7 @@ export const useMultipleImageLoader = (srcs, options = {}) => {
           return { 
             index, 
             src, 
-            src: options.fallbackSrc || "/placeholder-logo.png",
+            src: options.fallbackSrc || "/placeholder.svg",
             loading: false,
             error: true,
             loaded: true
@@ -128,7 +128,7 @@ export const useMultipleImageLoader = (srcs, options = {}) => {
             loadedImages[index] = {
               index,
               src: srcs[index],
-              src: options.fallbackSrc || "/placeholder-logo.png",
+              src: options.fallbackSrc || "/placeholder.svg",
               loading: false,
               error: true,
               loaded: true
