@@ -20,6 +20,16 @@ import SplashScreen from "./components/splash/SplashScreen";
 
 function App() {
   const { games, loading, error, usingMockData, isInitialLoad, refetchGames, forceMockData } = useGames();
+  
+  // Versión de juegos con rating y discount para todas las páginas
+  const gamesWithRatingAndDiscount = useMemo(() => 
+    games.map(game => ({
+      ...game,
+      discount: game.discount ?? Math.floor(Math.random() * 40),
+      rating: game.rating ?? (Math.random() * 2 + 3),
+    })), [games]
+  );
+
   const {
     filteredGames,
     searchTerm,
@@ -39,7 +49,7 @@ function App() {
     totalPages,
     totalGames,
     currentPageGames
-  } = useGameFilters(games);
+  } = useGameFilters(gamesWithRatingAndDiscount);
 
   // Splash Screen state - sincronizado con la carga real de datos
   const [showSplash, setShowSplash] = useState(true);
@@ -69,19 +79,11 @@ function App() {
   );
 
   const gamesWithDiscount = useMemo(() => 
-    games.map(game => ({
-      ...game,
-      discount: game.discount ?? Math.floor(Math.random() * 40),
-      rating: game.rating ?? (Math.random() * 2 + 3),
-    })), [games]
+    gamesWithRatingAndDiscount, [gamesWithRatingAndDiscount]
   );
 
   const gamesWithRating = useMemo(() => 
-    games.map(game => ({
-      ...game,
-      discount: game.discount ?? Math.floor(Math.random() * 40),
-      rating: game.rating ?? (Math.random() * 2 + 3),
-    })), [games]
+    gamesWithRatingAndDiscount, [gamesWithRatingAndDiscount]
   );
 
   const offersFiltered = useMemo(() => 
@@ -145,7 +147,7 @@ function App() {
   const pageCounts = useMemo(() => {
     const baseCounts = {
       filteredCount: filteredGames.length,
-      totalCount: games.length
+      totalCount: gamesWithRatingAndDiscount.length
     };
 
     if (location.pathname === '/ofertas') {
@@ -160,7 +162,7 @@ function App() {
       };
     }
     return baseCounts;
-  }, [location.pathname, filteredGames.length, games.length, offersFilteredCount, offersFiltered.length, mustHaveFilteredCount, mustHaveFiltered.length]);
+  }, [location.pathname, filteredGames.length, gamesWithRatingAndDiscount.length, offersFilteredCount, offersFiltered.length, mustHaveFilteredCount, mustHaveFiltered.length]);
 
   useEffect(() => {
     if (isCartOpen) setCartShouldRender(true);
@@ -240,7 +242,7 @@ function App() {
       }, 500);
       
       return () => clearInterval(progressInterval);
-    } else if (games.length > 0) {
+    } else if (gamesWithRatingAndDiscount.length > 0) {
       // Datos cargados - completar y ocultar
       setSplashProgress(100);
       setSplashText('¡Bienvenido a Mi Nuevo Vicio!');
@@ -258,7 +260,7 @@ function App() {
         setShowSplash(false);
       }, 2000);
     }
-  }, [isInitialLoad, loading, games.length, error]);
+  }, [isInitialLoad, loading, gamesWithRatingAndDiscount.length, error]);
 
   const handleSplashComplete = useCallback(() => {
     setShowSplash(false);
@@ -281,7 +283,7 @@ function App() {
             <AppLayout cartCount={cartCount} toggleCart={toggleCart} toggleLogin={toggleLogin}>
               <MainRoutes
                 showSplash={showSplash}
-                games={games}
+                games={gamesWithRatingAndDiscount}
                 filteredGames={filteredGames}
                 offersFiltered={offersFiltered}
                 mustHaveFiltered={mustHaveFiltered}
