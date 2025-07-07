@@ -2,9 +2,11 @@
 export const API_CONFIG = {
   // MockAPI.io - Reemplazar con tu proyecto ID real
   MOCKAPI: {
-    BASE_URL: 'https://6865687b5b5d8d0339810fd1.mockapi.io/api/v1',
+    BASE_URL: process.env.NODE_ENV === 'production'
+      ? '/api/products'
+      : 'https://6865687b5b5d8d0339810fd1.mockapi.io/api/v1/products',
     ENDPOINTS: {
-      PRODUCTS: '/products'
+      PRODUCTS: ''
     }
   },
   
@@ -21,7 +23,7 @@ export const API_CONFIG = {
 };
 
 // Función helper para construir URLs de MockAPI
-export const buildMockAPIUrl = (endpoint) => {
+export const buildMockAPIUrl = (endpoint = '') => {
   return `${API_CONFIG.MOCKAPI.BASE_URL}${endpoint}`;
 };
 

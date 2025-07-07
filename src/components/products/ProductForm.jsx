@@ -144,13 +144,17 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
       [name]: value
     }));
     
-    // Validar campo en tiempo real si ya ha sido tocado
+
     if (touched[name]) {
       const error = validateField(name, value);
-      setErrors(prev => ({
-        ...prev,
-        [name]: error
-      }));
+      setErrors(prev => {
+        const newErrors = { ...prev, [name]: error };
+        
+        if (!error) delete newErrors[name];
+
+        if (Object.values(newErrors).every(e => !e)) return {};
+        return newErrors;
+      });
     }
   };
 
