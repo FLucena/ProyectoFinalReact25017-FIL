@@ -90,10 +90,6 @@ function App() {
     gamesWithRating.filter(game => game.rating >= 4.5), [gamesWithRating]
   );
 
-  // Hook de paginación unificado
-  const offersPagination = usePagination(offersFiltered);
-  const mustHavePagination = usePagination(mustHaveFiltered);
-
   const applyFiltersToGames = useCallback((gamesToFilter) => {
     return gamesToFilter.filter(game => {
       let match = true;
@@ -110,13 +106,39 @@ function App() {
     });
   }, [searchTerm, selectedPlatform, selectedGenre]);
 
+  // Aplicar filtros a las ofertas y must-have
+  const offersWithFilters = useMemo(() => 
+    applyFiltersToGames(offersFiltered), [applyFiltersToGames, offersFiltered]
+  );
+
+  const mustHaveWithFilters = useMemo(() => 
+    applyFiltersToGames(mustHaveFiltered), [applyFiltersToGames, mustHaveFiltered]
+  );
+
+  // Hook de paginación unificado - ahora usando las versiones filtradas
+  const offersPagination = usePagination(offersWithFilters);
+  const mustHavePagination = usePagination(mustHaveWithFilters);
+
   const offersFilteredCount = useMemo(() => 
-    applyFiltersToGames(offersFiltered).length, [applyFiltersToGames, offersFiltered]
+    offersWithFilters.length, [offersWithFilters]
   );
 
   const mustHaveFilteredCount = useMemo(() => 
-    applyFiltersToGames(mustHaveFiltered).length, [applyFiltersToGames, mustHaveFiltered]
+    mustHaveWithFilters.length, [mustHaveWithFilters]
   );
+
+  // Resetear paginación cuando cambien los filtros
+  useEffect(() => {
+    if (location.pathname === '/ofertas') {
+      offersPagination.resetToFirstPage();
+    }
+  }, [searchTerm, selectedPlatform, selectedGenre, location.pathname, offersPagination]);
+
+  useEffect(() => {
+    if (location.pathname === '/infaltables') {
+      mustHavePagination.resetToFirstPage();
+    }
+  }, [searchTerm, selectedPlatform, selectedGenre, location.pathname, mustHavePagination]);
 
   const pageCounts = useMemo(() => {
     const baseCounts = {
@@ -259,6 +281,8 @@ function App() {
                 showSplash={showSplash}
                 games={games}
                 filteredGames={filteredGames}
+                offersFiltered={offersFiltered}
+                mustHaveFiltered={mustHaveFiltered}
                 offersPagination={offersPagination}
                 mustHavePagination={mustHavePagination}
                 // Props para filtros
