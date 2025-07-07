@@ -197,11 +197,6 @@ const GameFilters = ({
               <Pagination size="sm" className="mb-0">
                 {renderPaginationItems()}
               </Pagination>
-              {totalPages > 10 && (
-                <small className="text-muted mt-1">
-                  Usa los botones de navegación para moverte rápido
-                </small>
-              )}
             </div>
           )}
         </div>

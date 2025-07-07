@@ -72,12 +72,14 @@ function App() {
     games.map(game => ({
       ...game,
       discount: game.discount ?? Math.floor(Math.random() * 40),
+      rating: game.rating ?? (Math.random() * 2 + 3),
     })), [games]
   );
 
   const gamesWithRating = useMemo(() => 
     games.map(game => ({
       ...game,
+      discount: game.discount ?? Math.floor(Math.random() * 40),
       rating: game.rating ?? (Math.random() * 2 + 3),
     })), [games]
   );
