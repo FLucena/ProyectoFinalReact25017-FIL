@@ -3,6 +3,7 @@
 import ProductCard from "./ProductCard"
 import MockDataNotification from '../../components/MockDataNotification';
 import { Alert } from "react-bootstrap"
+import { useMemo } from "react"
 
 const Offers = ({ 
   games = [], 
@@ -14,7 +15,11 @@ const Offers = ({
   cartItems, 
   usingMockData,
   onRefetch,
-  onForceMock
+  onForceMock,
+  currentPage = 1,
+  totalPages = 1,
+  totalGames = 0,
+  currentPageGames = 0
 }) => {
   if (loading) {
     return (
@@ -47,6 +52,14 @@ const Offers = ({
     );
   }
 
+  // Calcular los juegos de la página actual
+  const itemsPerPage = 12;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedGames = useMemo(() => 
+    games.slice(startIndex, endIndex), [games, currentPage, itemsPerPage]
+  );
+
   return (
     <div className="container py-4">
       <h2 className="mb-4">Ofertas Especiales</h2>
@@ -59,7 +72,7 @@ const Offers = ({
       />
       
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-        {games.map((game, index) => (
+        {paginatedGames.map((game, index) => (
           <div key={game.id} className="col">
             <ProductCard
               product={game}

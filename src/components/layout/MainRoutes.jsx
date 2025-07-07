@@ -54,8 +54,8 @@ const MainRoutes = (props) => {
       {showFilters && <GameFilters {...props} {...paginationProps} />}
       <Routes>
         <Route path="/" element={<ProductList {...props} />} />
-        <Route path="/ofertas" element={<Offers {...props} games={props.offersPagination?.paginatedItems || []} />} />
-        <Route path="/infaltables" element={<MustHave {...props} games={props.mustHavePagination?.paginatedItems || []} />} />
+        <Route path="/ofertas" element={<Offers {...props} {...paginationProps} games={props.offersFiltered || []} />} />
+        <Route path="/infaltables" element={<MustHave {...props} {...paginationProps} games={props.mustHaveFiltered || []} />} />
         <Route path="/product/:id" element={<ProductDetail {...props} />} />
         <Route path="/perfil" element={<ProtectedRoute><Perfil {...props} /></ProtectedRoute>} />
         <Route path="/admin" element={<Admin {...props} />} />

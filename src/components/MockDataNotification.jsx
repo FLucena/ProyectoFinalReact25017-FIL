@@ -34,7 +34,7 @@ const MockDataNotification = ({
           size="sm"
           onClick={onRefetch}
           aria-label="Reintentar carga de datos"
-          className="ms-auto me-2"
+          className="mx-4"
         >
           <FaSync className="me-1" />
           Reintentar
