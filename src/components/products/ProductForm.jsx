@@ -92,9 +92,6 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
         return '';
       
       case 'image':
-        if (value && !isValidUrl(value)) {
-          return 'Por favor ingresa una URL válida';
-        }
         return '';
       
       default:
@@ -102,14 +99,7 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
     }
   };
 
-  const isValidUrl = (string) => {
-    try {
-      new URL(string);
-      return true;
-    } catch (_) {
-      return false;
-    }
-  };
+
 
   const validateForm = () => {
     const newErrors = {};
@@ -122,13 +112,7 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
       }
     });
 
-    // Validar URL de imagen si se proporciona
-    if (formData.image) {
-      const imageError = validateField('image', formData.image);
-      if (imageError) {
-        newErrors.image = imageError;
-      }
-    }
+
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
