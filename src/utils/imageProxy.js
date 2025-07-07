@@ -112,7 +112,7 @@ export const optimizeForLCP = (url, options = {}) => {
 
   if (!url) {
     return {
-      url: '/placeholder-logo.png',
+      url: '/game-placeholder.webp',
       attributes: {
         fetchpriority: 'high',
         loading: 'eager',

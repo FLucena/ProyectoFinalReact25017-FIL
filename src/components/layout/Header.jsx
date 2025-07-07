@@ -139,7 +139,7 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
                     <Dropdown.Divider role="separator" />
                     <Dropdown.Item 
                       onClick={handleLogout} 
-                      className="text-danger"
+                      className="text-muted"
                       role="menuitem"
                       aria-label="Cerrar sesión"
                       style={{ color: "#212529", opacity: 1, pointerEvents: "auto", textDecoration: "none" }}
@@ -302,7 +302,7 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
                       <Dropdown.Divider role="separator" />
                       <Dropdown.Item 
                         onClick={handleLogout} 
-                        className="text-danger"
+                        className="text-muted"
                         role="menuitem"
                         aria-label="Cerrar sesión"
                         style={{ color: "#212529", opacity: 1, pointerEvents: "auto", textDecoration: "none" }}

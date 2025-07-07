@@ -391,7 +391,7 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
             Cancelar
           </Button>
           <Button 
-            variant="danger" 
+            variant="primary" 
             type="submit" 
             disabled={isLoading || !isFormValid()}
           >

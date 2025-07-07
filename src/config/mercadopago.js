@@ -17,8 +17,8 @@ export const createPaymentPreference = async (items, payer = null) => {
         title: item.title,
         unit_price: parseFloat(item.price),
         quantity: item.quantity || 1,
-        currency_id: 'ARS', // Cambiar según tu país
-        picture_url: item.image || 'https://via.placeholder.com/150',
+        currency_id: 'ARS',
+        picture_url: item.image || '/game-placeholder.webp',
         description: item.description || '',
       })),
       back_urls: {

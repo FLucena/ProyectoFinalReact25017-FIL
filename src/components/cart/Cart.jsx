@@ -67,7 +67,7 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
               Necesitas iniciar sesión para acceder al carrito de compras.
             </p>
             <Button 
-              variant="danger" 
+              variant="primary" 
               onClick={() => {
                 handleCloseCart();
                 toggleLogin();
@@ -114,7 +114,7 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
           {safeCart.length > 0 && (
             <div className="p-2 border-bottom text-end">
               <Button 
-                variant="outline-danger" 
+                variant="outline-secondary" 
                 size="sm" 
                 onClick={() => setShowClearModal(true)}
                 aria-label="Vaciar todo el carrito"
@@ -205,7 +205,7 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
                             variant="link"
                             size="sm"
                             onClick={() => handleDeleteClick(item)}
-                            className="text-danger p-0"
+                            className="text-muted p-0"
                             aria-label={`Eliminar ${item.title} del carrito`}
                           >
                             <FaTrash size={18} />
@@ -227,7 +227,7 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
                 <span className="fw-bold text-primary">${total.toFixed(2)}</span>
               </div>
               <Button 
-                variant="danger" 
+                variant="primary" 
                 className="w-100 py-2 d-flex align-items-center justify-content-center gap-2"
                 onClick={() => setShowCheckout(true)}
                 aria-label="Proceder al pago con MercadoPago"

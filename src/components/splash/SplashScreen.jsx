@@ -200,9 +200,6 @@ const SimpleSplashScreen = ({ onComplete, progress = 0, loadingText = 'Iniciando
         <Logo 
           src="/mi nuevo vicio.webp" 
           alt="Mi Nuevo Vicio"
-          onError={(e) => {
-            e.target.src = '/placeholder-logo.png';
-          }}
         />
       </LogoContainer>
       

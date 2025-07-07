@@ -241,7 +241,7 @@ const Admin = () => {
                   <div>
                     {loading ? (
                       <div className="text-center py-5">
-                        <Spinner animation="border" variant="danger" />
+                        <Spinner animation="border" variant="primary" />
                         <p className="mt-3">Cargando productos...</p>
                       </div>
                     ) : (

@@ -14,7 +14,7 @@ const getModernImageUrl = (src, format) => {
 const ImageWithFallback = ({ 
   src, 
   alt, 
-  fallbackSrc = "/placeholder-logo.png",
+  fallbackSrc = "/game-placeholder.webp",
   className = "", 
   style = {},
   onLoad,

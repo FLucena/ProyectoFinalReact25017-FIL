@@ -1,7 +1,6 @@
 const CACHE_NAME = 'mi-nuevo-vicio-v1';
 const CRITICAL_RESOURCES = [
   '/',
-  '/placeholder-logo.png',
   '/placeholder-logo.svg'
 ];
 
@@ -135,7 +134,7 @@ self.addEventListener('fetch', (event) => {
           }).catch((error) => {
     
             // Intentar servir placeholder si es una imagen
-            return caches.match('/placeholder-logo.png').catch(() => {
+            return caches.match('/placeholder-logo.svg').catch(() => {
               return new Response('Image not available', { status: 404 });
             });
           });

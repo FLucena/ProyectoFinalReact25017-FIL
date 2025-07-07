@@ -283,7 +283,7 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
               
               {!isAdded ? (
                 <Button
-                  variant="danger"
+                  variant="primary"
                   size="lg"
                   className="d-flex align-items-center gap-2 ps-3"
                   onClick={handleAddToCart}

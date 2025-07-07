@@ -9,7 +9,7 @@ import { isExternalImage, getProxiedImageUrl, preloadImage } from '../utils/imag
  */
 export const useImageLoader = (src, options = {}) => {
   const {
-    fallbackSrc = "/placeholder-logo.png",
+    fallbackSrc = "/game-placeholder.webp",
     useProxy = true,
     preload = false
   } = options;

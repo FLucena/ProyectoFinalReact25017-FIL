@@ -59,7 +59,7 @@ const SobreProyecto = () => {
             <Card.Body>
               <Row>
                 <Col md={6}>
-                  <h6 className="text-danger mb-3">
+                  <h6 className="text-warning mb-3">
                     <FaExclamationTriangle className="me-2" />
                     Lo que NO es:
                   </h6>

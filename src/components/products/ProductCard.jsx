@@ -242,7 +242,7 @@ const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuan
           aspectRatio="16/9"
           isLCP={isLCP}
         />
-        {discount && discount > 0 && (
+        {typeof discount === 'number' && discount > 0 && (
           <StyledBadge 
             bg="danger" 
             className="position-absolute top-0 start-0 m-2"
@@ -265,9 +265,9 @@ const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuan
         <StyledBadge 
           bg="primary" 
           className="position-absolute bottom-0 start-0 m-2"
-          aria-label={`Plataforma: ${platform}`}
+          aria-label={`Plataforma: ${platform || 'Sin plataforma'}`}
         >
-          {platform}
+          {platform ? platform : 'Sin plataforma'}
         </StyledBadge>
         
         <ActionOverlay role="group" aria-label="Acciones del producto">
@@ -293,19 +293,18 @@ const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuan
           id={`product-title-${product.id}`}
           className="fs-6 fw-bold"
         >
-          {title}
+          {title || 'Sin título'}
         </StyledTitle>
-        
-        <Badge bg="success" className="me-2 mb-2" aria-label={`Género: ${genre}`}>
-          {genre}
+        <Badge bg="success" className="me-2 mb-2" aria-label={`Género: ${genre || 'Sin género'}`}> 
+          {genre ? genre : 'Sin género'}
         </Badge>
         
         <Card.Text className="small text-muted mb-2">
-          Editor: {publisher || 'No disponible'}
+          Editor: {publisher || 'Sin editor'}
         </Card.Text>
         
         <Card.Text className="small text-muted mb-3">
-          Fecha: {formatDate(release_date)}
+          Fecha: {formatDate(release_date) || 'Sin fecha'}
         </Card.Text>
         
         <div className="mt-auto">
@@ -337,7 +336,7 @@ const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuan
             
             {!isAdded ? (
               <Button
-                variant="danger"
+                variant="primary"
                 size="sm"
                 onClick={handleAddToCart}
                 className="d-flex align-items-center gap-1"
@@ -349,7 +348,7 @@ const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuan
             ) : (
               <div className="btn-group btn-group-sm" role="group" aria-label={`Controles de cantidad para ${title}`}>
                 <Button 
-                  variant="outline-danger" 
+                  variant="outline-secondary" 
                   onClick={(e) => handleQuantityChange(e, quantity - 1)}
                   title="Reducir cantidad"
                   aria-label={quantity === 1 ? `Eliminar ${title} del carrito` : `Reducir cantidad de ${title}`}
@@ -360,7 +359,7 @@ const ProductCard = ({ product, addToCart, removeFromCart, cartItems, updateQuan
                   {quantity}
                 </QuantityDisplay>
                 <Button 
-                  variant="outline-danger" 
+                  variant="outline-secondary" 
                   onClick={(e) => handleQuantityChange(e, quantity + 1)}
                   title="Aumentar cantidad"
                   aria-label={`Aumentar cantidad de ${title}`}
