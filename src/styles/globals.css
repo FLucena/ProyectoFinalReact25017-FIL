@@ -527,3 +527,17 @@ div.bg-light .text-warning-accessible {
   color: var(--bs-warning-darker) !important;
   font-weight: 500;
 } 
+
+.cart-badge.cart-badge-float {
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  box-shadow: 0 0 0 2px #212529;
+}
+
+.cart-badge {
+  background: red !important;
+}
+
+.btn.position-relative {
+  overflow: visible !important;
+} 

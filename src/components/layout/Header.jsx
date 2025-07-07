@@ -74,8 +74,7 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
                 {cartCount > 0 && (
                   <span
                     id="cart-count-mobile"
-                    className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary"
-                    style={{ fontSize: "0.7rem" }}
+                    className="position-absolute top-0 start-100 badge rounded-pill bg-primary cart-badge cart-badge-float"
                     aria-label={`${cartCount} artículos en el carrito`}
                   >
                     {cartCount}
@@ -228,8 +227,7 @@ const Header = ({ cartCount, toggleCart, toggleLogin }) => {
                   {cartCount > 0 && (
                     <span
                       id="cart-count-desktop"
-                      className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary"
-                      style={{ fontSize: "0.7rem" }}
+                      className="position-absolute top-0 start-100 badge rounded-pill bg-primary cart-badge cart-badge-float"
                       aria-label={`${cartCount} artículos en el carrito`}
                     >
                       {cartCount}
