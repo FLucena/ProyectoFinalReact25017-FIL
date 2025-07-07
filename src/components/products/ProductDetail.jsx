@@ -162,7 +162,7 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
         <Col md={5}>
           <div className="position-relative">
             <img
-              src={thumbnail}
+              src={thumbnail && thumbnail.startsWith('http') ? `/api/image-proxy?url=${encodeURIComponent(thumbnail)}` : thumbnail}
               alt={title}
               className="img-fluid rounded shadow"
               width="800"
@@ -191,7 +191,7 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
                 {screenshots.slice(0, 3).map((screenshot, index) => (
                   <Col xs={4} key={index}>
                     <img 
-                      src={screenshot.image} 
+                      src={screenshot.image && screenshot.image.startsWith('http') ? `/api/image-proxy?url=${encodeURIComponent(screenshot.image)}` : screenshot.image}
                       alt={`Screenshot ${index+1}`}
                       className="img-fluid rounded"
                       width="120"
