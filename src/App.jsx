@@ -136,13 +136,13 @@ function App() {
     if (location.pathname === '/ofertas') {
       offersPagination.resetToFirstPage();
     }
-  }, [searchTerm, selectedPlatform, selectedGenre, location.pathname, offersPagination]);
+  }, [searchTerm, selectedPlatform, selectedGenre, location.pathname]);
 
   useEffect(() => {
     if (location.pathname === '/infaltables') {
       mustHavePagination.resetToFirstPage();
     }
-  }, [searchTerm, selectedPlatform, selectedGenre, location.pathname, mustHavePagination]);
+  }, [searchTerm, selectedPlatform, selectedGenre, location.pathname]);
 
   const pageCounts = useMemo(() => {
     const baseCounts = {

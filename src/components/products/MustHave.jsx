@@ -24,7 +24,7 @@ const MustHave = ({
   if (loading) {
     return (
       <div className="container py-4">
-        <h2 className="mb-4">Must Have</h2>
+        <h2 className="mb-4">Infaltables</h2>
         <div className="text-center">
           <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Cargando...</span>
@@ -38,7 +38,7 @@ const MustHave = ({
   if (!games || games.length === 0) {
     return (
       <div className="container py-4">
-        <h2 className="mb-4">Must Have</h2>
+        <h2 className="mb-4">Infaltables</h2>
         <MockDataNotification 
           usingMockData={usingMockData}
           error={error}
@@ -62,7 +62,7 @@ const MustHave = ({
 
   return (
     <div className="container py-4">
-      <h2 className="mb-4">Must Have</h2>
+      <h2 className="mb-4">Infaltables</h2>
       
       <MockDataNotification 
         usingMockData={usingMockData}
