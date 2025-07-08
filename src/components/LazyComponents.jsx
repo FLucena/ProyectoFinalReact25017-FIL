@@ -7,8 +7,6 @@ const Admin = lazy(() => import('../pages/Admin'));
 const Perfil = lazy(() => import('../pages/Perfil'));
 const SobreProyecto = lazy(() => import('../pages/SobreProyecto'));
 const Contacto = lazy(() => import('../pages/Contacto'));
-const PaymentSuccess = lazy(() => import('../pages/PaymentSuccess'));
-const PaymentFailure = lazy(() => import('../pages/PaymentFailure'));
 const ProductDetail = lazy(() => import('./products/ProductDetail'));
 const Cart = lazy(() => import('./cart/Cart'));
 const Login = lazy(() => import('./auth/Login'));
@@ -49,18 +47,6 @@ export const LazySobreProyecto = () => (
 export const LazyContacto = () => (
   <LazyRouteLoader>
     <Contacto />
-  </LazyRouteLoader>
-);
-
-export const LazyPaymentSuccess = () => (
-  <LazyRouteLoader>
-    <PaymentSuccess />
-  </LazyRouteLoader>
-);
-
-export const LazyPaymentFailure = () => (
-  <LazyRouteLoader>
-    <PaymentFailure />
   </LazyRouteLoader>
 );
 

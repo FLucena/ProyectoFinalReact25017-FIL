@@ -3,8 +3,6 @@ import Admin from '../../pages/Admin';
 import Perfil from '../../pages/Perfil';
 import SobreProyecto from '../../pages/SobreProyecto';
 import Contacto from '../../pages/Contacto';
-// import PaymentSuccess from '../../pages/PaymentSuccess';
-// import PaymentFailure from '../../pages/PaymentFailure';
 import ProductDetail from '../products/ProductDetail';
 import ProductList from '../products/ProductList';
 import Offers from '../products/Offers';
@@ -37,8 +35,7 @@ const MainRoutes = (props) => {
         <Route path="/admin" element={<Admin {...props} />} />
         <Route path="/sobre-proyecto" element={<SobreProyecto {...props} />} />
         <Route path="/contacto" element={<Contacto {...props} />} />
-        {/* <Route path="/payment/success" element={<PaymentSuccess {...props} />} /> */}
-        {/* <Route path="/payment/failure" element={<PaymentFailure {...props} />} /> */}
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

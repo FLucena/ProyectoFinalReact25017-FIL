@@ -40,9 +40,7 @@ export default defineConfig(({ mode }) => ({
             './src/pages/Admin.jsx',
             './src/pages/Perfil.jsx',
             './src/pages/SobreProyecto.jsx',
-            './src/pages/Contacto.jsx',
-            './src/pages/PaymentSuccess.jsx',
-            './src/pages/PaymentFailure.jsx'
+            './src/pages/Contacto.jsx'
           ]
         }
       }

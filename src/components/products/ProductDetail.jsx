@@ -5,6 +5,7 @@ import { ArrowLeft, ShoppingCart, Minus, Plus, Trash2, Star } from "lucide-react
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { useGameDetail } from '../../hooks/useGameDetail';
+import ProductCard from './ProductCard';
 
 const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToCart, removeFromCart, updateQuantity, cartItems }) => {
   const { id } = useParams();
@@ -149,6 +150,11 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
   } = product;
 
   const discountedPrice = price - (price * (discount / 100));
+
+  // Recomendaciones: hasta 4 juegos del mismo género, excluyendo el actual
+  const relatedProducts = (games || [])
+    .filter(g => g.id !== product.id && g.genre === genre)
+    .slice(0, 4);
 
   return (
     <Container className="py-4">
@@ -335,6 +341,20 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
           </div>
         </Col>
       </Row>
+
+      {/* Sección de recomendaciones */}
+      {relatedProducts.length > 0 && (
+        <div className="mt-5">
+          <h4 className="mb-4">Quizás también te puede interesar</h4>
+          <Row className="g-4">
+            {relatedProducts.map((game) => (
+              <Col key={game.id} xs={12} sm={6} md={3}>
+                <ProductCard product={game} addToCart={addToCart} removeFromCart={removeFromCart} cartItems={cartItems} updateQuantity={updateQuantity} />
+              </Col>
+            ))}
+          </Row>
+        </div>
+      )}
     </Container>
   );
 };
