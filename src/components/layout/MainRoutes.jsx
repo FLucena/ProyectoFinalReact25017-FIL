@@ -11,6 +11,7 @@ import Offers from '../products/Offers';
 import MustHave from '../products/MustHave';
 import GameFilters from '../products/GameFilters';
 import ProtectedRoute from '../auth/ProtectedRoute';
+import NotFound from '../../pages/NotFound';
 
 const MainRoutes = (props) => {
   const showFilters = !['/login', '/perfil', '/admin', '/sobre-proyecto', '/contacto', '/payment/success', '/payment/failure'].includes(window.location.pathname);
@@ -63,7 +64,7 @@ const MainRoutes = (props) => {
         <Route path="/contacto" element={<Contacto {...props} />} />
         <Route path="/payment/success" element={<PaymentSuccess {...props} />} />
         <Route path="/payment/failure" element={<PaymentFailure {...props} />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );

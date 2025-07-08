@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, Save, Plus, AlertCircle } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Save, Plus, AlertCircle } from 'lucide-react';
 import { Modal, Button, Form, Alert } from 'react-bootstrap';
 
 const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
@@ -15,6 +15,15 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [touched, setTouched] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+
+  const fieldRefs = {
+    title: useRef(null),
+    price: useRef(null),
+    description: useRef(null),
+    genre: useRef(null),
+    platform: useRef(null),
+  };
 
   const isEditing = !!product;
 
@@ -99,6 +108,13 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
     }
   };
 
+  const FIELD_LABELS = {
+    title: "Nombre del Producto",
+    price: "Precio",
+    description: "Descripción",
+    genre: "Género",
+    platform: "Plataforma",
+  };
 
 
   const validateForm = () => {
@@ -112,15 +128,20 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
       }
     });
 
-
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitted(true);
     if (!validateForm()) {
+      // Scroll to the first error field
+      const firstErrorField = Object.keys(errors)[0];
+      if (firstErrorField && fieldRefs[firstErrorField]?.current) {
+        fieldRefs[firstErrorField].current.focus();
+        fieldRefs[firstErrorField].current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
     setIsLoading(true);
@@ -143,16 +164,13 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
       ...prev,
       [name]: value
     }));
-    
 
-    if (touched[name]) {
+    // Solo valida y actualiza errores si el formulario ya fue enviado
+    if (submitted) {
       const error = validateField(name, value);
       setErrors(prev => {
         const newErrors = { ...prev, [name]: error };
-        
         if (!error) delete newErrors[name];
-
-        if (Object.values(newErrors).every(e => !e)) return {};
         return newErrors;
       });
     }
@@ -164,12 +182,14 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
       ...prev,
       [name]: true
     }));
-    
-    const error = validateField(name, value);
-    setErrors(prev => ({
-      ...prev,
-      [name]: error
-    }));
+    // Solo valida y actualiza errores si el formulario ya fue enviado
+    if (submitted) {
+      const error = validateField(name, value);
+      setErrors(prev => ({
+        ...prev,
+        [name]: error
+      }));
+    }
   };
 
   const isFormValid = () => {
@@ -191,6 +211,18 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
       
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
+          {/* Error summary at the top */}
+          {Object.keys(errors).length > 0 && (
+            <Alert variant="danger" className="mb-3">
+              <AlertCircle size={16} className="me-2" />
+              <strong>Corrige los siguientes errores:</strong>
+              <ul className="mb-0 mt-2">
+                {Object.entries(errors).map(([field, msg]) => (
+                  <li key={field}><strong>{FIELD_LABELS[field] || field}:</strong> {msg || 'Este campo es obligatorio'}</li>
+                ))}
+              </ul>
+            </Alert>
+          )}
           <div className="row">
             <div className="col-md-6">
               <Form.Group className="mb-3">
@@ -201,9 +233,10 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
                   value={formData.title}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  isInvalid={!!errors.title}
+                  isInvalid={submitted && !!errors.title}
                   placeholder="Ej: The Legend of Zelda"
                   aria-describedby="title-help"
+                  ref={fieldRefs.title}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.title}
@@ -223,12 +256,13 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
                   value={formData.price}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  isInvalid={!!errors.price}
+                  isInvalid={submitted && !!errors.price}
                   placeholder="59.99"
                   step="0.01"
                   min="0"
                   max="999.99"
                   aria-describedby="price-help"
+                  ref={fieldRefs.price}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.price}
@@ -249,9 +283,10 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
               value={formData.description}
               onChange={handleChange}
               onBlur={handleBlur}
-              isInvalid={!!errors.description}
+              isInvalid={submitted && !!errors.description}
               placeholder="Describe el juego en al menos 10 caracteres..."
               aria-describedby="description-help"
+              ref={fieldRefs.description}
             />
             <Form.Control.Feedback type="invalid">
               {errors.description}
@@ -270,8 +305,9 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
                   value={formData.genre}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  isInvalid={!!errors.genre}
+                  isInvalid={submitted && !!errors.genre}
                   aria-describedby="genre-help"
+                  ref={fieldRefs.genre}
                 >
                   <option value="">Seleccionar género</option>
                   <option value="Acción">Acción</option>
@@ -304,8 +340,9 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
                   value={formData.platform}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  isInvalid={!!errors.platform}
+                  isInvalid={submitted && !!errors.platform}
                   aria-describedby="platform-help"
+                  ref={fieldRefs.platform}
                 >
                   <option value="">Seleccionar plataforma</option>
                   <option value="PC">PC</option>
@@ -331,18 +368,13 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
               <Form.Group className="mb-3">
                 <Form.Label>URL de la Imagen</Form.Label>
                 <Form.Control
-                  type="url"
+                  type="text"
                   name="image"
                   value={formData.image}
                   onChange={handleChange}
-                  onBlur={handleBlur}
-                  isInvalid={!!errors.image}
                   placeholder="https://ejemplo.com/imagen.jpg"
                   aria-describedby="image-help"
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.image}
-                </Form.Control.Feedback>
                 <Form.Text id="image-help" className="text-muted">
                   Opcional. Si no se proporciona, se usará una imagen por defecto.
                 </Form.Text>
