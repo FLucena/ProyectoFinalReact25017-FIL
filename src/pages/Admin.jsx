@@ -9,9 +9,7 @@ import {
   Plus, 
   Edit, 
   Trash2, 
-  Eye, 
   Search,
-  Filter,
   SortAsc,
   SortDesc
 } from "lucide-react"
@@ -24,9 +22,7 @@ import {
   Form,
   Alert,
   Spinner,
-  Card,
-  Row,
-  Col
+  Card
 } from "react-bootstrap"
 
 const Admin = () => {

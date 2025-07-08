@@ -1,10 +1,8 @@
 // Configuración de APIs
 export const API_CONFIG = {
-  // MockAPI.io - Reemplazar con tu proyecto ID real
+  // MockAPI.io - Siempre usar MockAPI.io
   MOCKAPI: {
-    BASE_URL: process.env.NODE_ENV === 'production'
-      ? '/api/products'
-      : 'https://6865687b5b5d8d0339810fd1.mockapi.io/api/v1/products',
+    BASE_URL: 'https://6865687b5b5d8d0339810fd1.mockapi.io/api/v1/products',
     ENDPOINTS: {
       PRODUCTS: ''
     }
