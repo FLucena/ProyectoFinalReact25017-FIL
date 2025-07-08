@@ -55,44 +55,30 @@ export const useGames = () => {
     }
   }, [validateGameData]);
 
+  // Solo buscar en la API si NO estamos en development
   const attemptFetchFromAPI = useCallback(async () => {
     const isDevelopment = process.env.NODE_ENV === 'development';
-    
     if (isDevelopment) {
-      // En desarrollo, intentar directamente con la API
-      const url = 'https://www.freetogame.com/api/games';
-      try {
-        const data = await fetchWithTimeout(url, 5000);
-        if (data && data.length > 0) {
-          return data;
-        }
-        throw new Error("La API no devolvió datos válidos");
-      } catch (err) {
-        throw new Error("Error al conectar con la API en desarrollo");
+      throw new Error('Modo desarrollo: solo se usan datos de demostración');
+    }
+    // En producción, usar nuestro proxy serverless
+    const url = buildFreeToGameUrl('', {});
+    try {
+      const data = await fetchWithTimeout(url, 10000);
+      if (data && data.length > 0) {
+        return data;
       }
-    } else {
-      // En producción, usar nuestro proxy serverless
-      const url = buildFreeToGameUrl('', {});
-      try {
-        const data = await fetchWithTimeout(url, 10000);
-        if (data && data.length > 0) {
-          return data;
-        }
-        throw new Error("El proxy no devolvió datos válidos");
-      } catch (err) {
-        throw new Error("Error al conectar con el proxy serverless");
-      }
+      throw new Error("El proxy no devolvió datos válidos");
+    } catch (err) {
+      throw new Error("Error al conectar con el proxy serverless");
     }
   }, [fetchWithTimeout]);
 
   const loadFullData = useCallback(async () => {
     setLoading(true);
     setIsInitialLoad(true);
-    
     const isDevelopment = process.env.NODE_ENV === 'development';
-    const forceApiAttempt = true;
-    
-    if (isDevelopment && !forceApiAttempt) {
+    if (isDevelopment) {
       try {
         const mockResponse = await fetchMockGames(800);
         setGames(mockResponse.data);
@@ -106,7 +92,7 @@ export const useGames = () => {
       }
       return;
     }
-    
+    // En producción, intentar la API y fallback a mock
     const apiTimeout = setTimeout(async () => {
       try {
         const mockResponse = await fetchMockGames(500);
@@ -120,7 +106,6 @@ export const useGames = () => {
         setIsInitialLoad(false);
       }
     }, 25000);
-    
     try {
       const data = await attemptFetchFromAPI();
       clearTimeout(apiTimeout);
@@ -129,7 +114,6 @@ export const useGames = () => {
       setError(null);
     } catch (err) {
       clearTimeout(apiTimeout);
-      
       try {
         const mockResponse = await fetchMockGames(500);
         setGames(mockResponse.data);
@@ -151,7 +135,20 @@ export const useGames = () => {
   const refetchGames = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    if (isDevelopment) {
+      try {
+        const mockResponse = await fetchMockGames(500);
+        setGames(mockResponse.data);
+        setUsingMockData(true);
+        setError("🛠️ Usando datos de demostración");
+      } catch (mockErr) {
+        setError("❌ Error al cargar datos de demostración");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
     try {
       const data = await attemptFetchFromAPI();
       setGames(data);
@@ -167,12 +164,11 @@ export const useGames = () => {
   const forceMockData = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
     try {
       const mockResponse = await fetchMockGames(500);
       setGames(mockResponse.data);
       setUsingMockData(true);
-      setError("🛠️ Usando datos de demostración por solicitud del usuario");
+      setError("🛠️ Usando datos de demostración");
     } catch (mockErr) {
       setError("❌ Error al cargar datos de demostración");
     } finally {

@@ -57,41 +57,38 @@ const ErrorDisplay = ({
   };
 
   return (
-    <Alert variant={getVariant()} className={className}>
-      <div className="d-flex align-items-start">
-        <div className="me-2 mt-1">
-          {getIcon()}
+    <Alert variant={getVariant()} className={`py-2 px-3 d-flex align-items-center ${className}`} style={{ marginBottom: 0 }}>
+      <div className="d-flex align-items-center me-3">
+        {getIcon()}
+        <div className="ms-2">
+          <strong>{getTitle()}</strong>
+          <span className="ms-2 small text-muted">{getMessage()}</span>
         </div>
-        <div className="flex-grow-1">
-          <h6 className="alert-heading mb-2">{getTitle()}</h6>
-          <p className="mb-2">{getMessage()}</p>
-          {children}
-          
-          <div className="d-flex gap-2 mt-3">
-            {showRetry && onRetry && (
-              <Button 
-                variant={`outline-${getVariant()}`} 
-                size="sm"
-                onClick={onRetry}
-                className="d-flex align-items-center gap-1"
-              >
-                <RefreshCw size={14} />
-                Reintentar
-              </Button>
-            )}
-            {showDismiss && onDismiss && (
-              <Button 
-                variant="outline-secondary" 
-                size="sm"
-                onClick={onDismiss}
-                className="d-flex align-items-center gap-1"
-              >
-                <X size={14} />
-                Cerrar
-              </Button>
-            )}
-          </div>
-        </div>
+      </div>
+      <div className="ms-auto d-flex gap-2 align-items-center">
+        {showRetry && onRetry && (
+          <Button 
+            variant={`outline-${getVariant()}`} 
+            size="sm"
+            onClick={onRetry}
+            className="d-flex align-items-center gap-1"
+          >
+            <RefreshCw size={14} />
+            Reintentar
+          </Button>
+        )}
+        {showDismiss && onDismiss && (
+          <Button 
+            variant="outline-secondary" 
+            size="sm"
+            onClick={onDismiss}
+            className="d-flex align-items-center gap-1"
+          >
+            <X size={14} />
+            Cerrar
+          </Button>
+        )}
+        {children}
       </div>
     </Alert>
   );

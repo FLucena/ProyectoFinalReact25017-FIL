@@ -30,7 +30,15 @@ const MainRoutes = (props) => {
         <Route path="/" element={<ProductList {...props} />} />
         <Route path="/ofertas" element={<Offers {...props} {...paginationProps} games={props.offersFiltered || []} />} />
         <Route path="/infaltables" element={<MustHave {...props} {...paginationProps} games={props.mustHaveFiltered || []} />} />
-        <Route path="/product/:id" element={<ProductDetail {...props} />} />
+        <Route path="/product/:id" element={<ProductDetail 
+          games={props.games}
+          loading={props.loading}
+          error={props.error}
+          addToCart={props.addToCart}
+          removeFromCart={props.removeFromCart}
+          updateQuantity={props.updateQuantity}
+          cartItems={props.cartItems}
+        />} />
         <Route path="/perfil" element={<ProtectedRoute><Perfil {...props} /></ProtectedRoute>} />
         <Route path="/admin" element={<Admin {...props} />} />
         <Route path="/sobre-proyecto" element={<SobreProyecto {...props} />} />
