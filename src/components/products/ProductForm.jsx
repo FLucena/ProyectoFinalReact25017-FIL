@@ -212,7 +212,7 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
           {/* Error summary at the top */}
-          {Object.keys(errors).length > 0 && (
+          {submitted && Object.keys(errors).length > 0 && (
             <Alert variant="danger" className="mb-3">
               <AlertCircle size={16} className="me-2" />
               <strong>Corrige los siguientes errores:</strong>
