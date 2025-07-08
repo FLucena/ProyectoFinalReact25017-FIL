@@ -51,6 +51,7 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
     }
     setErrors({});
     setTouched({});
+    setSubmitted(false);
   }, [product, show]);
 
   const validateField = (name, value) => {
