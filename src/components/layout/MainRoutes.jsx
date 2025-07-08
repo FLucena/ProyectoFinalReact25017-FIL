@@ -3,8 +3,8 @@ import Admin from '../../pages/Admin';
 import Perfil from '../../pages/Perfil';
 import SobreProyecto from '../../pages/SobreProyecto';
 import Contacto from '../../pages/Contacto';
-import PaymentSuccess from '../../pages/PaymentSuccess';
-import PaymentFailure from '../../pages/PaymentFailure';
+// import PaymentSuccess from '../../pages/PaymentSuccess';
+// import PaymentFailure from '../../pages/PaymentFailure';
 import ProductDetail from '../products/ProductDetail';
 import ProductList from '../products/ProductList';
 import Offers from '../products/Offers';
@@ -14,41 +14,16 @@ import ProtectedRoute from '../auth/ProtectedRoute';
 import NotFound from '../../pages/404';
 
 const MainRoutes = (props) => {
-  const showFilters = !['/login', '/perfil', '/admin', '/sobre-proyecto', '/contacto', '/payment/success', '/payment/failure'].includes(window.location.pathname);
+  const showFilters = !['/login', '/perfil', '/admin', '/sobre-proyecto', '/contacto'].includes(window.location.pathname);
 
-  // Determinar qué props de paginación usar según la ruta
-  const getPaginationProps = () => {
-    const pathname = window.location.pathname;
-    
-    if (pathname === '/ofertas') {
-      return {
-        currentPage: props.offersPagination?.currentPage || 1,
-        setCurrentPage: props.offersPagination?.setCurrentPage || (() => {}),
-        totalPages: props.offersPagination?.totalPages || 1,
-        totalGames: props.offersPagination?.totalItems || 0,
-        currentPageGames: props.offersPagination?.currentPageItems || 0
-      };
-    } else if (pathname === '/infaltables') {
-      return {
-        currentPage: props.mustHavePagination?.currentPage || 1,
-        setCurrentPage: props.mustHavePagination?.setCurrentPage || (() => {}),
-        totalPages: props.mustHavePagination?.totalPages || 1,
-        totalGames: props.mustHavePagination?.totalItems || 0,
-        currentPageGames: props.mustHavePagination?.currentPageItems || 0
-      };
-    } else {
-      // Homepage y otras rutas usan la paginación principal
-      return {
-        currentPage: props.currentPage || 1,
-        setCurrentPage: props.setCurrentPage || (() => {}),
-        totalPages: props.totalPages || 1,
-        totalGames: props.totalGames || 0,
-        currentPageGames: props.currentPageGames || 0
-      };
-    }
+  // Paginación para Offers y MustHave
+  const paginationProps = {
+    currentPage: props.currentPage,
+    setCurrentPage: props.setCurrentPage,
+    totalPages: props.totalPages,
+    totalGames: props.totalGames,
+    currentPageGames: props.currentPageGames
   };
-
-  const paginationProps = getPaginationProps();
 
   return (
     <>
@@ -62,8 +37,8 @@ const MainRoutes = (props) => {
         <Route path="/admin" element={<Admin {...props} />} />
         <Route path="/sobre-proyecto" element={<SobreProyecto {...props} />} />
         <Route path="/contacto" element={<Contacto {...props} />} />
-        <Route path="/payment/success" element={<PaymentSuccess {...props} />} />
-        <Route path="/payment/failure" element={<PaymentFailure {...props} />} />
+        {/* <Route path="/payment/success" element={<PaymentSuccess {...props} />} /> */}
+        {/* <Route path="/payment/failure" element={<PaymentFailure {...props} />} /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

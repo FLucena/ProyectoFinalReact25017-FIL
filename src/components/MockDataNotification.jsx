@@ -1,5 +1,6 @@
 import { Alert, Button } from 'react-bootstrap';
 import { FaInfoCircle, FaSync } from 'react-icons/fa';
+import ErrorDisplay from './ui/ErrorDisplay';
 
 const MockDataNotification = ({ 
   usingMockData, 
@@ -12,22 +13,35 @@ const MockDataNotification = ({
     return null;
   }
 
-  const getVariant = () => {
-    if (error && error.includes('❌')) return 'danger';
-    if (error && error.includes('🛠️')) return 'info';
-    return 'warning';
-  };
+  // Si hay un error, usar ErrorDisplay
+  if (error) {
+    return (
+      <ErrorDisplay
+        error={error}
+        onRetry={onRefetch}
+        onDismiss={onForceMock}
+        className={className}
+      >
+        {onForceMock && (
+          <Button 
+            variant="outline-secondary" 
+            size="sm"
+            onClick={onForceMock}
+            aria-label="Forzar datos de demostración"
+            className="mt-2"
+          >
+            Usar Demo
+          </Button>
+        )}
+      </ErrorDisplay>
+    );
+  }
 
-  const getIcon = () => {
-    if (error && error.includes('❌')) return <FaInfoCircle />;
-    if (error && error.includes('🛠️')) return <FaInfoCircle />;
-    return <FaInfoCircle />;
-  };
-
+  // Si no hay error pero estamos usando mock data
   return (
-    <Alert variant={getVariant()} className={className}>
-      <span className="me-2">{getIcon()}</span>
-      <span>{error || "Usando datos de demostración"}</span>
+    <Alert variant="info" className={className}>
+      <span className="me-2"><FaInfoCircle /></span>
+      <span>Usando datos de demostración</span>
       {onRefetch && (
         <Button 
           variant="outline-primary" 

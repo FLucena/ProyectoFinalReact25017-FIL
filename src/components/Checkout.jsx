@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button, Modal, Alert, Spinner, Card, Row, Col } from 'react-bootstrap';
-import { CreditCard, ShoppingCart, CheckCircle, XCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Button, Modal, Alert, Spinner, Card } from 'react-bootstrap';
+import { CreditCard, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { createPaymentPreference } from '../config/mercadopago';
+import PaymentSuccessModal from './payment/PaymentSuccessModal';
 
 const Checkout = ({ show, onHide, cartItems, total, onPaymentSuccess, onPaymentFailure }) => {
   const [loading, setLoading] = useState(false);
-  const [paymentUrl, setPaymentUrl] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [paymentData, setPaymentData] = useState(null);
 
   const handleCheckout = async () => {
     if (!cartItems || cartItems.length === 0) {
@@ -25,31 +25,30 @@ const Checkout = ({ show, onHide, cartItems, total, onPaymentSuccess, onPaymentF
       const result = await createPaymentPreference(cartItems);
 
       if (result.success) {
-        // Redirigir al usuario a MercadoPago
-        const checkoutUrl = result.sandboxInitPoint || result.initPoint;
-        setPaymentUrl(checkoutUrl);
-        
-        // Abrir en nueva ventana o redirigir
-        window.open(checkoutUrl, '_blank');
-        
-        toast.success('Redirigiendo a MercadoPago...');
-        onHide(); // Cerrar modal
+        // Simular pago exitoso y mostrar modal
+        setPaymentData({
+          paymentId: result.preferenceId,
+          preferenceId: result.preferenceId,
+          status: 'approved',
+          cartItems,
+          total
+        });
+        setShowSuccessModal(true);
+        onHide(); // Cerrar modal de checkout
+        toast.success('¡Pago simulado exitoso!');
+        if (onPaymentSuccess) onPaymentSuccess();
       } else {
         setError(result.error || 'Error al crear la preferencia de pago');
         toast.error('Error al procesar el pago');
+        if (onPaymentFailure) onPaymentFailure();
       }
     } catch (err) {
       console.error('Error en checkout:', err);
       setError('Error inesperado al procesar el pago');
       toast.error('Error inesperado');
+      if (onPaymentFailure) onPaymentFailure();
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleManualCheckout = () => {
-    if (paymentUrl) {
-      window.open(paymentUrl, '_blank');
     }
   };
 
@@ -146,25 +145,17 @@ const Checkout = ({ show, onHide, cartItems, total, onPaymentSuccess, onPaymentF
         </Modal.Footer>
       </Modal>
 
-      {/* Modal de confirmación si el usuario no fue redirigido automáticamente */}
-      {paymentUrl && (
-        <Modal show={!!paymentUrl} onHide={() => setPaymentUrl('')} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>Redirigir a MercadoPago</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>¿No se abrió automáticamente la página de pago?</p>
-            <p>Haz clic en el botón de abajo para ir a MercadoPago:</p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setPaymentUrl('')}>
-              Cancelar
-            </Button>
-            <Button variant="primary" onClick={handleManualCheckout}>
-              Ir a MercadoPago
-            </Button>
-          </Modal.Footer>
-        </Modal>
+      {/* Modal de éxito de pago */}
+      {showSuccessModal && paymentData && (
+        <PaymentSuccessModal
+          show={showSuccessModal}
+          onHide={() => setShowSuccessModal(false)}
+          paymentId={paymentData.paymentId}
+          preferenceId={paymentData.preferenceId}
+          status={paymentData.status}
+          cartItems={paymentData.cartItems}
+          total={paymentData.total}
+        />
       )}
     </>
   );

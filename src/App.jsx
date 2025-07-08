@@ -16,6 +16,7 @@ import AppLayout from './components/layout/AppLayout';
 import MainRoutes from './components/layout/MainRoutes';
 import CartManager from './components/cart/CartManager';
 import LoginManager from './components/auth/LoginManager';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 import SplashScreen from "./components/splash/SplashScreen";
 
 function App() {
@@ -277,66 +278,68 @@ function App() {
           loadingText={splashText}
         />
       )}
-    <AuthProvider>
-      <ProductProvider>
-        <FavoritesProvider>
-            <AppLayout cartCount={cartCount} toggleCart={toggleCart} toggleLogin={toggleLogin}>
-              <MainRoutes
-                showSplash={showSplash}
-                games={gamesWithRatingAndDiscount}
-                filteredGames={filteredGames}
-                offersFiltered={offersFiltered}
-                mustHaveFiltered={mustHaveFiltered}
-                offersPagination={offersPagination}
-                mustHavePagination={mustHavePagination}
-                // Props para filtros
-                        searchTerm={searchTerm}
-                        setSearchTerm={setSearchTerm}
-                        selectedPlatform={selectedPlatform}
-                        setSelectedPlatform={setSelectedPlatform}
-                        selectedGenre={selectedGenre}
-                        setSelectedGenre={setSelectedGenre}
-                        sortBy={sortBy}
-                        setSortBy={setSortBy}
-                        clearFilters={clearFilters}
-                        hasActiveFilters={hasActiveFilters}
-                        platforms={platforms}
-                        genres={genres}
-                // Props para paginación
-                        currentPage={currentPage}
-                        setCurrentPage={setCurrentPage}
-                        totalPages={totalPages}
-                        totalGames={totalGames}
-                        currentPageGames={currentPageGames}
-                // Props para carrito
-                      addToCart={addToCart} 
+      <ErrorBoundary>
+        <AuthProvider>
+          <ProductProvider>
+            <FavoritesProvider>
+                <AppLayout cartCount={cartCount} toggleCart={toggleCart} toggleLogin={toggleLogin}>
+                  <MainRoutes
+                    showSplash={showSplash}
+                    games={gamesWithRatingAndDiscount}
+                    filteredGames={filteredGames}
+                    offersFiltered={offersFiltered}
+                    mustHaveFiltered={mustHaveFiltered}
+                    offersPagination={offersPagination}
+                    mustHavePagination={mustHavePagination}
+                    // Props para filtros
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
+                            selectedPlatform={selectedPlatform}
+                            setSelectedPlatform={setSelectedPlatform}
+                            selectedGenre={selectedGenre}
+                            setSelectedGenre={setSelectedGenre}
+                            sortBy={sortBy}
+                            setSortBy={setSortBy}
+                            clearFilters={clearFilters}
+                            hasActiveFilters={hasActiveFilters}
+                            platforms={platforms}
+                            genres={genres}
+                    // Props para paginación
+                            currentPage={currentPage}
+                            setCurrentPage={setCurrentPage}
+                            totalPages={totalPages}
+                            totalGames={totalGames}
+                            currentPageGames={currentPageGames}
+                    // Props para carrito
+                          addToCart={addToCart} 
+                          removeFromCart={removeFromCart}
+                    updateQuantity={updateQuantity}
+                          cartItems={cartItems}
+                    // Props para estado de carga
+                          loading={loading}
+                          error={error}
+                          usingMockData={usingMockData}
+                          isInitialLoad={isInitialLoad}
+                    refetchGames={refetchGames}
+                    forceMockData={forceMockData}
+                        />
+                  <LoginManager isLoginOpen={isLoginOpen} closeLogin={() => setIsLoginOpen(false)} />
+                  <CartManager
+                    cartShouldRender={cartShouldRender}
+                        cartItems={cartItems}
                       removeFromCart={removeFromCart}
-                updateQuantity={updateQuantity}
-                      cartItems={cartItems}
-                // Props para estado de carga
-                      loading={loading}
-                      error={error}
-                      usingMockData={usingMockData}
-                      isInitialLoad={isInitialLoad}
-                refetchGames={refetchGames}
-                forceMockData={forceMockData}
+                      closeCart={closeCart}
+                      updateQuantity={updateQuantity}
+                      clearCart={clearCart}
+                      isOpen={isCartOpen}
+                      onExited={handleCartExited}
+                      toggleLogin={toggleLogin}
                     />
-              <LoginManager isLoginOpen={isLoginOpen} closeLogin={() => setIsLoginOpen(false)} />
-              <CartManager
-                cartShouldRender={cartShouldRender}
-                    cartItems={cartItems}
-                  removeFromCart={removeFromCart}
-                  closeCart={closeCart}
-                  updateQuantity={updateQuantity}
-                  clearCart={clearCart}
-                  isOpen={isCartOpen}
-                  onExited={handleCartExited}
-                  toggleLogin={toggleLogin}
-                />
-            </AppLayout>
-        </FavoritesProvider>
-      </ProductProvider>
-    </AuthProvider>
+                </AppLayout>
+            </FavoritesProvider>
+          </ProductProvider>
+        </AuthProvider>
+      </ErrorBoundary>
     </>
   );
 }

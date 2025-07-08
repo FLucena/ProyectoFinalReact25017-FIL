@@ -98,7 +98,20 @@ const ProductDetail = ({ games, loading: gamesLoading, error: gamesError, addToC
     return (
       <Container className="py-5">
         <Alert variant="danger">
-          Error al cargar el juego: {error}
+          <h4 className="alert-heading">Error al cargar el juego</h4>
+          <p className="mb-0">{error}</p>
+          <hr />
+          <div className="d-flex gap-2">
+            <Link to="/" className="btn btn-outline-primary btn-sm">
+              Volver a la tienda
+            </Link>
+            <button 
+              className="btn btn-outline-secondary btn-sm"
+              onClick={() => window.location.reload()}
+            >
+              Reintentar
+            </button>
+          </div>
         </Alert>
       </Container>
     );

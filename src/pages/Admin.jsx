@@ -92,6 +92,7 @@ const Admin = () => {
       setShowProductForm(false);
     } catch (error) {
       console.error('Error al agregar producto:', error);
+      // El error ya se maneja en el ProductContext y se muestra en el formulario
     }
   };
 
@@ -102,6 +103,7 @@ const Admin = () => {
       setEditingProduct(null);
     } catch (error) {
       console.error('Error al editar producto:', error);
+      // El error ya se maneja en el ProductContext y se muestra en el formulario
     }
   };
 
@@ -112,6 +114,7 @@ const Admin = () => {
       setProductToDelete(null);
     } catch (error) {
       console.error('Error al eliminar producto:', error);
+      // El error ya se maneja en el ProductContext
     }
   };
 

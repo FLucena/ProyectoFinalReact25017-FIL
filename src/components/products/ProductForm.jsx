@@ -154,6 +154,11 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
       onHide();
     } catch (error) {
       console.error('Error al guardar producto:', error);
+      // Mostrar error al usuario
+      setErrors(prev => ({
+        ...prev,
+        submit: error.message || 'Error al guardar el producto. Por favor, inténtalo de nuevo.'
+      }));
     } finally {
       setIsLoading(false);
     }
@@ -218,10 +223,22 @@ const ProductForm = ({ show, onHide, product = null, onSubmit }) => {
               <AlertCircle size={16} className="me-2" />
               <strong>Corrige los siguientes errores:</strong>
               <ul className="mb-0 mt-2">
-                {Object.entries(errors).map(([field, msg]) => (
-                  <li key={field}><strong>{FIELD_LABELS[field] || field}:</strong> {msg || 'Este campo es obligatorio'}</li>
-                ))}
+                {Object.entries(errors).map(([field, msg]) => {
+                  // No mostrar errores de envío en la lista de campos
+                  if (field === 'submit') return null;
+                  return (
+                    <li key={field}><strong>{FIELD_LABELS[field] || field}:</strong> {msg || 'Este campo es obligatorio'}</li>
+                  );
+                })}
               </ul>
+            </Alert>
+          )}
+          
+          {/* Error de envío específico */}
+          {errors.submit && (
+            <Alert variant="danger" className="mb-3">
+              <AlertCircle size={16} className="me-2" />
+              <strong>Error al guardar:</strong> {errors.submit}
             </Alert>
           )}
           <div className="row">

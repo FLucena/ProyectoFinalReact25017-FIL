@@ -48,6 +48,12 @@ const ProductList = ({
           onRefetch={refetchGames}
           onForceMock={forceMockData}
         />
+        <div className="text-center py-4">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+          <p className="mt-3 text-muted">Cargando productos...</p>
+        </div>
         <Row xs={1} sm={2} md={3} lg={4} className="g-4">
           {Array.from({ length: 8 }).map((_, index) => (
             <Col key={`skeleton-${index}`}>
@@ -68,8 +74,24 @@ const ProductList = ({
           onRefetch={refetchGames}
           onForceMock={forceMockData}
         />
-        <div className="alert alert-info" role="alert">
-          No se encontraron juegos
+        <div className="text-center py-5">
+          <div className="alert alert-info" role="alert">
+            <h4 className="alert-heading">No se encontraron juegos</h4>
+            <p className="mb-0">
+              {error ? 'Hubo un problema al cargar los productos.' : 'No hay productos disponibles en este momento.'}
+            </p>
+            {error && refetchGames && (
+              <>
+                <hr />
+                <button 
+                  className="btn btn-outline-primary btn-sm"
+                  onClick={refetchGames}
+                >
+                  Reintentar carga
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     )
