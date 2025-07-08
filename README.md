@@ -23,7 +23,6 @@ Proyecto educativo de ecommerce desarrollado con React que muestra juegos gratui
 - **Estilos**: Styled Components, CSS Modules
 - **Iconos**: Lucide React, React Icons
 - **Notificaciones**: React Toastify
-- **Pagos**: MercadoPago SDK
 - **Deployment**: Vercel
 
 ## 📦 Instalación

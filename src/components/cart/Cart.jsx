@@ -230,10 +230,10 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
                 variant="primary" 
                 className="w-100 py-2 d-flex align-items-center justify-content-center gap-2"
                 onClick={() => setShowCheckout(true)}
-                aria-label="Proceder al pago con MercadoPago"
+                aria-label="Proceder al pago"
               >
                 <FaCreditCard size={16} />
-                Pagar con MercadoPago
+                Pagar
               </Button>
             </div>
           )}
@@ -302,7 +302,7 @@ const Cart = ({ cart, removeFromCart, closeCart, updateQuantity, clearCart, isOp
         </Modal.Footer>
       </Modal>
 
-      {/* Componente de Checkout con MercadoPago */}
+      {/* Componente de Checkout */}
       <Checkout
         show={showCheckout}
         onHide={() => setShowCheckout(false)}
