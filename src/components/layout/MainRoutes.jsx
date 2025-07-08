@@ -12,7 +12,8 @@ import ProtectedRoute from '../auth/ProtectedRoute';
 import NotFound from '../../pages/404';
 
 const MainRoutes = (props) => {
-  const showFilters = !['/login', '/perfil', '/admin', '/sobre-proyecto', '/contacto'].includes(window.location.pathname);
+  const hideFiltersPaths = ['/login', '/perfil', '/admin', '/sobre-proyecto', '/contacto', '/product'];
+  const showFilters = !hideFiltersPaths.some(path => window.location.pathname.startsWith(path));
 
   // Paginación para Offers y MustHave
   const paginationProps = {
