@@ -125,7 +125,7 @@ const ProductList = ({
               removeFromCart={removeFromCart}
               cartItems={cartItems}
               updateQuantity={updateQuantity}
-              isLCP={index === 0} // Mark first product as LCP image
+              isLCP={index === 0}
             />
           </Col>
         ))}

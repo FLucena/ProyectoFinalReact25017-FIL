@@ -10,10 +10,15 @@ Proyecto educativo de ecommerce desarrollado con React que muestra juegos gratui
 - **Filtros Avanzados**: Por plataforma, género y búsqueda por texto
 - **Carrito de Compras**: Funcionalidad completa de carrito con persistencia
 - **Autenticación**: Sistema de login/registro con roles (admin/usuario)
+- **Panel de Administración**: Gestión de productos, usuarios y estadísticas
+- **Sistema de Favoritos**: Guardar y gestionar juegos favoritos
+- **Páginas Informativas**: Sobre el proyecto, contacto y perfil de usuario
+- **Checkout Simulado**: Proceso de compra educativo
 - **Responsive Design**: Optimizado para todos los dispositivos
 - **PWA Ready**: Service Worker y manifest para funcionalidad offline
 - **Performance**: Optimizaciones de LCP, CLS y FID
 - **Accesibilidad**: Cumple con estándares WCAG 2.1
+- **SEO Optimizado**: Meta tags, Open Graph y estructura semántica
 
 ## 🛠️ Tecnologías
 
@@ -23,6 +28,8 @@ Proyecto educativo de ecommerce desarrollado con React que muestra juegos gratui
 - **Estilos**: Styled Components, CSS Modules
 - **Iconos**: Lucide React, React Icons
 - **Notificaciones**: React Toastify
+- **SEO**: React Helmet Async
+- **Utilidades**: date-fns para manejo de fechas
 - **Deployment**: Vercel
 
 ## 📦 Instalación
@@ -59,7 +66,6 @@ Se ha implementado una **función serverless** en Vercel que actúa como proxy p
 #### Archivos Creados:
 - `api/games.js` - Función serverless que maneja las solicitudes a la API
 - `vercel.json` - Configuración de Vercel para las rutas API
-- `scripts/dev-server.js` - Servidor de desarrollo para probar la API localmente
 
 #### Cómo Funciona:
 1. **En Desarrollo**: La aplicación intenta conectarse directamente a la API de FreeToGame
@@ -123,16 +129,6 @@ npm run dev:server       # Servidor con API proxy local
 npm run build           # Construir para producción
 npm run preview         # Previsualizar build
 
-# Análisis
-npm run analyze         # Analizar bundle
-npm run test:all        # Ejecutar todas las pruebas
-
-# Performance
-npm run test:performance    # Pruebas de rendimiento
-npm run test:compatibility # Pruebas de compatibilidad
-npm run test:load          # Pruebas de carga
-```
-
 ## 📊 Credenciales de Prueba
 
 ### Usuario Admin
@@ -150,20 +146,35 @@ npm run test:load          # Pruebas de carga
 - Filtros por plataforma, género y búsqueda
 - Paginación optimizada
 - Vista detallada de cada juego
+- Sistema de favoritos
 
 ### 2. Carrito de Compras
 - Agregar/remover productos
 - Modificar cantidades
 - Persistencia en localStorage
 - Cálculo automático de totales
+- Checkout simulado
 
 ### 3. Sistema de Autenticación
 - Login/Registro de usuarios
 - Roles diferenciados (admin/usuario)
 - Rutas protegidas
 - Gestión de sesiones
+- Perfil de usuario
 
-### 4. Optimizaciones de Performance
+### 4. Panel de Administración
+- Gestión de productos (CRUD)
+- Estadísticas de ventas
+- Gestión de usuarios
+- Dashboard con métricas
+
+### 5. Páginas Informativas
+- Sobre el proyecto (educativo)
+- Página de contacto
+- Página 404 personalizada
+- Información del desarrollador
+
+### 6. Optimizaciones de Performance
 - Lazy loading de componentes
 - Optimización de imágenes
 - Service Worker para caché
@@ -199,6 +210,40 @@ npm install
 # Reconstruir
 npm run build
 ```
+
+## 📁 Estructura del Proyecto
+
+```
+src/
+├── app/                    # Configuración de la app
+├── components/            # Componentes reutilizables
+│   ├── auth/             # Componentes de autenticación
+│   ├── cart/             # Componentes del carrito
+│   ├── layout/           # Componentes de layout
+│   ├── products/         # Componentes de productos
+│   ├── splash/           # Pantalla de carga
+│   └── ui/               # Componentes UI básicos
+├── context/              # Contextos de React
+├── data/                 # Datos mock y configuración
+├── hooks/                # Custom hooks
+├── pages/                # Páginas principales
+├── styles/               # Estilos globales
+└── utils/                # Utilidades y helpers
+```
+
+## 📱 PWA Features
+
+- **Service Worker**: Caché offline y actualizaciones automáticas
+- **Web App Manifest**: Instalación como app nativa
+- **Offline Support**: Funcionalidad básica sin conexión
+- **Push Notifications**: Preparado para notificaciones push
+
+## 🔒 Seguridad
+
+- **CORS Configuration**: Headers de seguridad apropiados
+- **Input Validation**: Validación de datos de entrada
+- **Error Handling**: Manejo seguro de errores
+- **Protected Routes**: Rutas protegidas por autenticación
 
 ## 📝 Licencia
 
